@@ -176,6 +176,9 @@
     video.poster = posterInicio;
     video.disablePictureInPicture = true;
     video.setAttribute("aria-label", cfg.descricao);
+    // Dica de proporção: reserva o espaço certo antes dos metadados.
+    video.width = ehMobile ? 720 : 1920;
+    video.height = 1080;
 
     // MP4 primeiro (universal); WebM como reserva de codec.
     var srcMp4 = document.createElement("source");
@@ -187,6 +190,15 @@
     video.appendChild(srcMp4);
     video.appendChild(srcWebm);
     wrap.appendChild(video);
+    // Com <source> inseridos via JS, o Safari só avalia as fontes após
+    // um load() explícito.
+    try { video.load(); } catch (e) { /* indiferente */ }
+
+    // O palco aparece já com a capa (primeiro quadro) — a visibilidade
+    // NUNCA depende do carregamento do vídeo.
+    requestAnimationFrame(function () {
+      stage.classList.add("is-ready");
+    });
 
     // Se NENHUMA fonte tocar (o erro dispara na última), mostra a flor
     // aberta e libera a rolagem normal.
@@ -194,6 +206,25 @@
       hero.classList.remove("hero--scrub");
       somenteImagem(posterFinal);
     });
+
+    // iPhone em economia de energia pode segurar o carregamento até o
+    // primeiro toque — destrava na primeira interação.
+    function destravar() {
+      if (video.readyState === 0) {
+        try { video.load(); } catch (e) { /* indiferente */ }
+      }
+    }
+    window.addEventListener("touchstart", destravar, { once: true, passive: true });
+    window.addEventListener("pointerdown", destravar, { once: true, passive: true });
+
+    // Vigia: se após 8s o vídeo não carregou nada, troca pela foto da
+    // flor aberta — a flor SEMPRE aparece.
+    setTimeout(function () {
+      if (video.readyState === 0 && document.body.contains(video)) {
+        hero.classList.remove("hero--scrub");
+        somenteImagem(posterFinal);
+      }
+    }, 8000);
 
     var duracao = 0;
     var atual = null;   // posição atual (suavizada) na linha do tempo

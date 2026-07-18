@@ -249,14 +249,17 @@ body.menu-aberto { overflow: hidden; }
 }
 
 /* Modo scroll (padrão): a seção é mais alta que a tela e o miolo fica
-   pinado enquanto a rolagem conduz o desabrochar do vídeo. */
+   pinado enquanto a rolagem conduz o desabrochar do vídeo.
+   (Cada medida tem fallback em vh para navegadores sem svh.) */
 .hero--scrub {
+  height: 240vh;
   height: 240svh;
 }
 
 .hero__pin {
   position: sticky;
   top: 0;
+  min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -288,11 +291,13 @@ body.menu-aberto { overflow: hidden; }
 .hero__stage {
   position: relative;
   container-type: inline-size;
+  width: min(100%, calc((100vh - 250px) * .6667));
   width: min(100%, calc((100svh - 250px) * .6667));
 }
 
 @media (min-width: 768px) {
   .hero__stage {
+    width: min(100%, var(--stage-max), calc((100vh - 265px) * 1.7778));
     width: min(100%, var(--stage-max), calc((100svh - 265px) * 1.7778));
   }
 }
@@ -307,10 +312,19 @@ body.menu-aberto { overflow: hidden; }
   margin: 0;
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: var(--wm-size);
+  /* Fallback p/ navegadores sem unidades de container (cqw). */
+  font-size: clamp(38px, 12.5vw, 60px);
   line-height: 1;
   white-space: nowrap;
   color: var(--ink);
+}
+
+@media (min-width: 768px) {
+  .hero__wordmark { font-size: clamp(44px, 5.2vw, 76px); }
+}
+
+@supports (font-size: 1cqw) {
+  .hero__wordmark { font-size: var(--wm-size); }
 }
 
 .hero__video-wrap {
@@ -327,6 +341,16 @@ body.menu-aberto { overflow: hidden; }
 .hero__video-wrap img {
   width: 100%;
   height: auto;
+  /* Garante a proporção certa antes mesmo dos metadados chegarem. */
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .hero__video-wrap video,
+  .hero__video-wrap img {
+    aspect-ratio: 16 / 9;
+  }
 }
 
 /* Entrada suave do palco quando o vídeo fica pronto. */
