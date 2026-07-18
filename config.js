@@ -99,6 +99,8 @@ const SITE = {
      ------------------------------------------------------------------ */
   galeria: {
     titulo: "Galeria",
+    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
+    assinatura: "momentos nossos",
     fotos: [
       { arquivo: "assets/img/placeholders/galeria-01.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
       { arquivo: "assets/img/placeholders/galeria-02.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
@@ -116,6 +118,8 @@ const SITE = {
      ------------------------------------------------------------------ */
   oDia: {
     titulo: "O dia",
+    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
+    assinatura: "o grande dia",
     introducao: "O essencial para viver esse dia com a gente.",
     rotuloData: "Data",
     rotuloHorario: "Horário",
@@ -128,6 +132,8 @@ const SITE = {
      ------------------------------------------------------------------ */
   presentes: {
     titulo: "Presentes",
+    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
+    assinatura: "com carinho",
     // Texto afetuoso antes do cartão do PIX.
     texto: "O presente maior é ter você com a gente no dia 16 de janeiro. Mas, se quiser nos ajudar a regar essa vida nova, ficaremos muito felizes com qualquer carinho enviado pela chave abaixo.",
     // Dados bancários exibidos no cartão.
@@ -151,7 +157,19 @@ const SITE = {
      ------------------------------------------------------------------ */
   rsvp: {
     titulo: "Confirme sua presença",
+    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
+    assinatura: "venha celebrar",
     introducao: "Sua presença é o que faz a festa. Conta pra gente que você vem?",
+    /* --------------------------------------------------------------
+       ONDE AS RESPOSTAS CAEM — Google Sheets
+       --------------------------------------------------------------
+       Cole abaixo, entre as aspas, a URL do seu Apps Script implantado
+       (termina em /exec). O passo a passo completo está no arquivo
+       rsvp-apps-script.gs, na raiz do projeto (leva ~5 minutos).
+       Enquanto este campo estiver vazio (""), o formulário apenas
+       simula o envio e NENHUMA resposta é gravada.
+       -------------------------------------------------------------- */
+    googleSheetsUrl: "",
     rotuloNome: "Nome completo",
     placeholderNome: "Como no convite",
     rotuloAcompanhantes: "Acompanhantes",

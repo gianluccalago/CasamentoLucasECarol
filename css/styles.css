@@ -4,14 +4,15 @@
    Todos os tokens de estilo vivem em :root. Trocar a paleta inteira do site
    exige editar apenas este bloco.
    Regras do sistema: zero drop-shadows (profundidade = passos de luminância),
-   acento laranja raro, divisores hairline tracejados, motivo botânico único.
+   divisores hairline tracejados, motivo botânico recorrente da flor de
+   laranjeira com o laranja como fio condutor alegre da paleta.
    ========================================================================== */
 
 /* --- Fontes self-hosted (variáveis, subset latino, display swap) ------- */
 
 @font-face {
-  font-family: "Cormorant Garamond";
-  src: url("../assets/fonts/cormorant-garamond.woff2") format("woff2");
+  font-family: "Playfair Display";
+  src: url("../assets/fonts/playfair-display.woff2") format("woff2");
   font-weight: 400 700;
   font-style: normal;
   font-display: swap;
@@ -26,8 +27,8 @@
 }
 
 @font-face {
-  font-family: "Ephesis";
-  src: url("../assets/fonts/ephesis.woff2") format("woff2");
+  font-family: "Great Vibes";
+  src: url("../assets/fonts/great-vibes.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -42,14 +43,15 @@
   --ink-soft: #6C5F51;         /* texto secundário e legendas */
   --sage: #8FA080;             /* verde-sálvia: detalhes botânicos */
   --sage-deep: #5C6B4F;        /* verde profundo: botão primário, contraste */
-  --blossom-orange: #E08A4F;   /* O ACENTO: traços, bordas e preenchimentos raros */
+  --blossom-orange: #E08A4F;   /* o acento laranja: flores, traços e detalhes */
   --blossom-orange-ink: #9C4E1D; /* laranja escurecido p/ TEXTO (contraste AA) */
+  --paper-blush: #F9EDDC;      /* creme levemente aquecido pelo laranja (cartões) */
   --hairline: #D8CBB4;         /* divisores tracejados 1px */
 
   /* --- Tipografia ------------------------------------------------------ */
-  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-display: "Playfair Display", Georgia, serif;
   --font-body: "Jost", system-ui, sans-serif;
-  --font-script: "Ephesis", cursive;
+  --font-script: "Great Vibes", cursive;
 
   /* --- Métricas -------------------------------------------------------- */
   --nav-height: 64px;
@@ -139,11 +141,20 @@ body.menu-aberto { overflow: hidden; }
 }
 
 .nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: .14em;
   text-decoration: none;
+}
+
+.nav__flor {
+  width: 20px;
+  height: 20px;
+  color: var(--blossom-orange);
 }
 
 .nav__links {
@@ -355,10 +366,19 @@ body.menu-aberto { overflow: hidden; }
   margin: 0;
   position: relative;
   z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: .3em;
   color: var(--ink);
+}
+
+.hero__date-flor {
+  width: 16px;
+  height: 16px;
+  color: var(--blossom-orange-ink);
 }
 
 .hero__scroll {
@@ -398,8 +418,8 @@ body.menu-aberto { overflow: hidden; }
   margin: 0 0 18px;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(30px, 4.5vw, 56px);
-  line-height: 1;
+  font-size: clamp(28px, 4.2vw, 50px);
+  line-height: 1.05;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -427,10 +447,10 @@ body.menu-aberto { overflow: hidden; }
   border-top: 1px dashed var(--hairline);
 }
 
-.divider__icon {
-  width: 22px;
-  height: 22px;
-  color: var(--blossom-orange);
+.divider__ramalhete {
+  width: 132px;
+  height: 30px;
+  flex-shrink: 0;
 }
 
 /* O divisor entre a seção elevada e a seguinte herda o mesmo canvas */
@@ -540,10 +560,15 @@ body.menu-aberto { overflow: hidden; }
 .assinatura {
   margin: 0 0 28px;
   font-family: var(--font-script);
-  font-size: clamp(28px, 3.4vw, 38px);
-  line-height: 1.1;
-  color: var(--sage-deep);
+  font-size: clamp(30px, 3.6vw, 42px);
+  line-height: 1.15;
+  color: var(--blossom-orange-ink);
 }
+
+/* Assinatura manuscrita logo abaixo dos títulos de seção */
+.assinatura--secao { margin: -8px 0 24px; }
+
+.assinatura--centro { text-align: center; }
 
 /* ==========================================================================
    3 · GALERIA
@@ -582,15 +607,15 @@ body.menu-aberto { overflow: hidden; }
   .galeria__item:hover img { transform: scale(1.02); }
 }
 
-/* Flor discreta no canto do primeiro cartão — peça única, intencional */
+/* Flor de laranjeira no canto de cada cartão da galeria */
 .galeria__item .galeria__flor {
   position: absolute;
   right: 12px;
   bottom: 12px;
   width: 20px;
   height: 20px;
-  color: var(--paper-elevated);
-  opacity: .9;
+  color: var(--blossom-orange);
+  opacity: .95;
   pointer-events: none;
 }
 
@@ -620,7 +645,7 @@ body.menu-aberto { overflow: hidden; }
 .odia__icone {
   width: 46px;
   height: 46px;
-  color: var(--sage-deep);
+  color: var(--blossom-orange);
   margin-bottom: 10px;
 }
 
@@ -661,7 +686,8 @@ body.menu-aberto { overflow: hidden; }
 }
 
 .pix-card {
-  background: var(--paper-elevated);
+  background: var(--paper-blush);
+  border: 1px dashed var(--blossom-orange);
   border-radius: var(--radius-card);
   padding: clamp(30px, 6vw, 52px);
   display: grid;
@@ -673,7 +699,7 @@ body.menu-aberto { overflow: hidden; }
 .pix-card__icone {
   width: 44px;
   height: 44px;
-  color: var(--sage-deep);
+  color: var(--blossom-orange);
 }
 
 .pix-card__dados {
@@ -812,7 +838,7 @@ body.menu-aberto { overflow: hidden; }
 .rsvp__sucesso-icone {
   width: 52px;
   height: 52px;
-  color: var(--sage-deep);
+  color: var(--blossom-orange);
   margin-bottom: 8px;
 }
 
@@ -850,6 +876,24 @@ body.menu-aberto { overflow: hidden; }
   color: var(--paper);
   opacity: .3;
   margin-bottom: 6px;
+}
+
+.rodape__flores {
+  display: flex;
+  gap: 18px;
+}
+
+.rodape__flores svg {
+  width: 18px;
+  height: 18px;
+  color: var(--paper);
+  opacity: .65;
+}
+
+.rodape__flores svg:nth-child(2) {
+  width: 24px;
+  height: 24px;
+  opacity: .9;
 }
 
 .rodape__nomes {

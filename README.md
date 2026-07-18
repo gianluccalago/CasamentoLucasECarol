@@ -3,6 +3,9 @@
 Site one-page, estático (HTML + CSS + JavaScript puro), em português do Brasil.
 **16 de janeiro de 2027 · 16h · Espaço Querência, São José dos Pinhais — PR.**
 
+Tipografia: **Playfair Display** (títulos), **Great Vibes** (manuscrita) e
+**Jost** (corpo), todas self-hosted em `assets/fonts/`.
+
 ## Como editar o conteúdo
 
 Todo o conteúdo do site (textos, nomes, datas, endereço, dados do PIX e
@@ -22,11 +25,17 @@ Todos os tokens de cor estão no bloco `:root` no topo de
 [`css/styles.css`](css/styles.css). Trocar a paleta inteira exige editar só
 esse bloco.
 
-### Conectar o RSVP a um serviço real
+### Onde caem as respostas do RSVP (Google Sheets)
 
-O formulário hoje simula o envio. O ponto único de integração é a função
-`submitRSVP(dados)` em [`js/main.js`](js/main.js) — há instruções comentadas
-lá para Formspree e Google Forms.
+As confirmações de presença são gravadas numa **planilha do Google** — uma
+linha por convidado (data/hora, nome, acompanhantes, observações). A
+configuração leva ~5 minutos e o passo a passo completo está no arquivo
+[`rsvp-apps-script.gs`](rsvp-apps-script.gs): você cria a planilha, cola o
+script no Apps Script dela, implanta como App da Web e cola a URL gerada no
+campo `rsvp.googleSheetsUrl` do `config.js`.
+
+**Importante:** enquanto essa URL estiver vazia, o formulário apenas simula
+o envio e nenhuma resposta é gravada.
 
 ## O vídeo do hero
 

@@ -49,6 +49,15 @@
       $("historia-paragrafos").appendChild(p);
     });
 
+    // Assinaturas manuscritas das seções (ocultas se vazias no config)
+    [["galeria-assinatura", SITE.galeria.assinatura],
+     ["odia-assinatura", SITE.oDia.assinatura],
+     ["presentes-assinatura", SITE.presentes.assinatura],
+     ["rsvp-assinatura", SITE.rsvp.assinatura]].forEach(function (par) {
+      var el = $(par[0]);
+      if (par[1]) { el.textContent = par[1]; } else { el.hidden = true; }
+    });
+
     // Galeria
     $("galeria-titulo").textContent = SITE.galeria.titulo;
     SITE.galeria.fotos.forEach(function (foto, i) {
@@ -64,16 +73,14 @@
       img.loading = "lazy";
       botao.appendChild(img);
 
-      // Flor discreta no canto do primeiro cartão (peça única)
-      if (i === 0) {
-        var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", "galeria__flor");
-        svg.setAttribute("aria-hidden", "true");
-        var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-        use.setAttribute("href", "#svg-flor");
-        svg.appendChild(use);
-        botao.appendChild(svg);
-      }
+      // Flor de laranjeira no canto de cada cartão
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "galeria__flor");
+      svg.setAttribute("aria-hidden", "true");
+      var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttribute("href", "#svg-flor");
+      svg.appendChild(use);
+      botao.appendChild(svg);
 
       botao.addEventListener("click", function () { abrirLightbox(i); });
       $("galeria-grid").appendChild(botao);
@@ -413,27 +420,34 @@
   }
 
   /* ------------------------------------------------------------------
-     RSVP
+     RSVP — PONTO ÚNICO DE INTEGRAÇÃO
      ------------------------------------------------------------------
-     PONTO ÚNICO DE INTEGRAÇÃO COM UM SERVIÇO REAL DE FORMULÁRIO:
-     A função submitRSVP(dados) abaixo hoje apenas simula o envio (1s).
-     Para conectar a um serviço, troque o corpo dela. Exemplos:
+     As respostas caem numa planilha do GOOGLE SHEETS via Apps Script.
+     Configuração (~5 min): siga o passo a passo no arquivo
+     rsvp-apps-script.gs (raiz do projeto) e cole a URL gerada no campo
+     rsvp.googleSheetsUrl do config.js.
 
-     — Formspree (crie um form em formspree.io e use o endpoint):
-       function submitRSVP(dados) {
-         return fetch("https://formspree.io/f/SEU_CODIGO", {
-           method: "POST",
-           headers: { "Content-Type": "application/json", Accept: "application/json" },
-           body: JSON.stringify(dados),
-         });
-       }
-
-     — Google Forms: monte a URL de resposta pré-preenchida do seu
-       formulário (formResponse) e envie via fetch com mode: "no-cors".
+     Enquanto a URL estiver vazia, o envio é apenas simulado (1s) e nada
+     é gravado. Observação técnica: o envio usa mode "no-cors" — padrão
+     para Apps Script — então o navegador não consegue ler a resposta;
+     o convidado sempre vê a confirmação. Teste a integração enviando
+     um RSVP você mesmo e conferindo a planilha.
      ------------------------------------------------------------------ */
   function submitRSVP(dados) {
-    void dados; // dados = { nome, acompanhantes, observacoes }
-    return new Promise(function (resolver) { setTimeout(resolver, 1000); });
+    var url = SITE.rsvp.googleSheetsUrl;
+    if (!url) {
+      // Sem URL configurada: simula o envio.
+      return new Promise(function (resolver) { setTimeout(resolver, 1000); });
+    }
+    return fetch(url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(dados),
+    }).catch(function (erro) {
+      // Falha de rede: não prende o convidado no "Enviando…".
+      console.warn("RSVP: falha ao enviar para a planilha", erro);
+    });
   }
 
   function montarRsvp() {

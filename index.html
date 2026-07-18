@@ -14,12 +14,34 @@
   <meta property="og:image" content="assets/img/hero-poster.jpg">
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
-  <!-- Fontes self-hosted (Cormorant Garamond, Jost, Ephesis) — ver styles.css -->
-  <link rel="preload" href="assets/fonts/ephesis.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Fontes self-hosted (Playfair Display, Jost, Great Vibes) — ver styles.css -->
+  <link rel="preload" href="assets/fonts/great-vibes.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/playfair-display.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Auto-recuperação: se o CSS não chegar (falha momentânea de rede/CDN,
+       comum logo após um deploy), recarrega a folha de estilo sozinho. -->
+  <script>
+    (function () {
+      var tentou = false;
+      function checarCss() {
+        if (tentou) return;
+        var token = getComputedStyle(document.documentElement).getPropertyValue("--paper");
+        if (!token || !token.trim()) {
+          tentou = true;
+          var l = document.createElement("link");
+          l.rel = "stylesheet";
+          l.href = "css/styles.css?recarga=" + Date.now();
+          document.head.appendChild(l);
+        }
+      }
+      window.addEventListener("DOMContentLoaded", checarCss);
+      window.addEventListener("load", checarCss);
+      setTimeout(checarCss, 2500);
+    })();
+  </script>
 </head>
 <body>
 
@@ -86,6 +108,29 @@
           <line x1="31.5" y1="16.5" x2="16.5" y2="31.5"/>
         </g>
       </symbol>
+
+      <!-- Ramalhete: flor de laranjeira central + hastes com folhas
+           (bicolor: folhas em sálvia, flor e botões em laranja) -->
+      <symbol id="svg-ramalhete" viewBox="0 0 140 32">
+        <g fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path stroke="var(--sage)" d="M14 22 C 30 14 42 13 54 15.5"/>
+          <path stroke="var(--sage)" d="M126 22 C 110 14 98 13 86 15.5"/>
+          <path stroke="var(--sage)" d="M30 17.8 C 26 11 20 9 14 10.5 C 16.5 16.5 22.5 19.5 30 17.8 Z"/>
+          <path stroke="var(--sage)" d="M46 15.5 C 44.5 9.5 40 6.5 34.5 6.8 C 35.8 12.5 40 15.6 46 15.5 Z"/>
+          <path stroke="var(--sage)" d="M110 17.8 C 114 11 120 9 126 10.5 C 123.5 16.5 117.5 19.5 110 17.8 Z"/>
+          <path stroke="var(--sage)" d="M94 15.5 C 95.5 9.5 100 6.5 105.5 6.8 C 104.2 12.5 100 15.6 94 15.5 Z"/>
+          <circle stroke="var(--blossom-orange)" cx="56" cy="22.5" r="2.2"/>
+          <circle stroke="var(--blossom-orange)" cx="84" cy="22.5" r="2.2"/>
+          <g stroke="var(--blossom-orange)">
+            <ellipse cx="70" cy="8.5" rx="2.6" ry="4.4"/>
+            <ellipse cx="70" cy="8.5" rx="2.6" ry="4.4" transform="rotate(72 70 16)"/>
+            <ellipse cx="70" cy="8.5" rx="2.6" ry="4.4" transform="rotate(144 70 16)"/>
+            <ellipse cx="70" cy="8.5" rx="2.6" ry="4.4" transform="rotate(216 70 16)"/>
+            <ellipse cx="70" cy="8.5" rx="2.6" ry="4.4" transform="rotate(288 70 16)"/>
+          </g>
+          <circle cx="70" cy="16" r="1.8" fill="var(--blossom-orange)" stroke="none"/>
+        </g>
+      </symbol>
     </defs>
   </svg>
 
@@ -93,7 +138,10 @@
        NAVEGAÇÃO
        ================================================================ -->
   <header class="nav" id="nav">
-    <a class="nav__brand" href="#inicio" id="nav-brand" aria-label="Voltar ao início"></a>
+    <a class="nav__brand" href="#inicio" aria-label="Voltar ao início">
+      <svg class="nav__flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+      <span id="nav-brand"></span>
+    </a>
     <nav class="nav__links" id="nav-links" aria-label="Seções do site"></nav>
     <button class="nav__burger" id="nav-burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
       <span></span><span></span>
@@ -117,7 +165,11 @@
           <h1 class="hero__wordmark" id="hero-wordmark"></h1>
           <div class="hero__video-wrap" id="hero-video-wrap"></div>
         </div>
-        <p class="hero__date" id="hero-date"></p>
+        <p class="hero__date">
+          <svg class="hero__date-flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+          <span id="hero-date"></span>
+          <svg class="hero__date-flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+        </p>
       </div>
       <a class="hero__scroll" href="#historia" aria-label="Rolar para a próxima seção">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -143,7 +195,7 @@
     </section>
 
     <div class="divider" aria-hidden="true">
-      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+      <svg class="divider__ramalhete"><use href="#svg-ramalhete"/></svg>
     </div>
 
     <!-- ==========================================================
@@ -152,12 +204,13 @@
     <section class="galeria section" id="galeria">
       <div class="section__inner">
         <h2 class="section__title reveal" id="galeria-titulo"></h2>
+        <p class="assinatura assinatura--secao reveal" id="galeria-assinatura" aria-hidden="true"></p>
         <div class="galeria__grid" id="galeria-grid"></div>
       </div>
     </section>
 
     <div class="divider" aria-hidden="true">
-      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+      <svg class="divider__ramalhete"><use href="#svg-ramalhete"/></svg>
     </div>
 
     <!-- ==========================================================
@@ -166,6 +219,7 @@
     <section class="odia section section--elevated" id="o-dia">
       <div class="section__inner">
         <h2 class="section__title reveal" id="odia-titulo"></h2>
+        <p class="assinatura assinatura--secao assinatura--centro reveal" id="odia-assinatura" aria-hidden="true"></p>
         <p class="section__intro reveal" id="odia-intro"></p>
         <div class="odia__grid">
           <article class="odia__bloco reveal">
@@ -191,7 +245,7 @@
     </section>
 
     <div class="divider" aria-hidden="true">
-      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+      <svg class="divider__ramalhete"><use href="#svg-ramalhete"/></svg>
     </div>
 
     <!-- ==========================================================
@@ -200,6 +254,7 @@
     <section class="presentes section" id="presentes">
       <div class="section__inner section__inner--narrow">
         <h2 class="section__title reveal" id="presentes-titulo"></h2>
+        <p class="assinatura assinatura--secao assinatura--centro reveal" id="presentes-assinatura" aria-hidden="true"></p>
         <p class="section__intro reveal" id="presentes-texto"></p>
         <div class="pix-card reveal" id="pix-card">
           <svg class="pix-card__icone" aria-hidden="true"><use href="#svg-laranja"/></svg>
@@ -217,7 +272,7 @@
     </section>
 
     <div class="divider" aria-hidden="true">
-      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+      <svg class="divider__ramalhete"><use href="#svg-ramalhete"/></svg>
     </div>
 
     <!-- ==========================================================
@@ -226,6 +281,7 @@
     <section class="rsvp section" id="rsvp">
       <div class="section__inner section__inner--narrow">
         <h2 class="section__title reveal" id="rsvp-titulo"></h2>
+        <p class="assinatura assinatura--secao assinatura--centro reveal" id="rsvp-assinatura" aria-hidden="true"></p>
         <p class="section__intro reveal" id="rsvp-intro"></p>
 
         <form class="rsvp__form reveal" id="rsvp-form" novalidate>
@@ -267,6 +323,11 @@
        ================================================================ -->
   <footer class="rodape">
     <svg class="rodape__ramo" aria-hidden="true"><use href="#svg-ramo"/></svg>
+    <div class="rodape__flores" aria-hidden="true">
+      <svg><use href="#svg-flor"/></svg>
+      <svg><use href="#svg-flor"/></svg>
+      <svg><use href="#svg-flor"/></svg>
+    </div>
     <p class="rodape__nomes" id="rodape-nomes"></p>
     <p class="rodape__agradecimento" id="rodape-agradecimento"></p>
     <p class="rodape__data" id="rodape-data"></p>
