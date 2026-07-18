@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO básico. Após publicar, troque o caminho da og:image por uma URL
+       absoluta (ex.: https://seudominio.com.br/assets/img/hero-poster.jpg). -->
+  <title>Lucas &amp; Carol — 16 . 01 . 2027</title>
+  <meta name="description" content="Vamos nos casar! 16 de janeiro de 2027, às 16h, no Espaço Querência, São José dos Pinhais — PR. Confirme sua presença.">
+  <meta property="og:title" content="Lucas &amp; Carol — 16 . 01 . 2027">
+  <meta property="og:description" content="Vamos nos casar! 16 de janeiro de 2027, às 16h, no Espaço Querência, São José dos Pinhais — PR.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/img/hero-poster.jpg">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+
+  <!-- Fontes self-hosted (Cormorant Garamond, Jost, Ephesis) — ver styles.css -->
+  <link rel="preload" href="assets/fonts/ephesis.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ================================================================
+       SPRITE SVG — motivos botânicos autorais (traço fino 1.5px)
+       flor de laranjeira · ramo com folhas · laranja inteira · fatia
+       ================================================================ -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <defs>
+      <!-- Flor de laranjeira: 5 pétalas -->
+      <symbol id="svg-flor" viewBox="0 0 48 48">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(72 24 24)"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(144 24 24)"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(216 24 24)"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(288 24 24)"/>
+          <circle cx="24" cy="24" r="2.4"/>
+          <line x1="24" y1="21.6" x2="24" y2="20.6" transform="rotate(36 24 24)"/>
+          <line x1="24" y1="21.6" x2="24" y2="20.6" transform="rotate(108 24 24)"/>
+          <line x1="24" y1="21.6" x2="24" y2="20.6" transform="rotate(180 24 24)"/>
+          <line x1="24" y1="21.6" x2="24" y2="20.6" transform="rotate(252 24 24)"/>
+          <line x1="24" y1="21.6" x2="24" y2="20.6" transform="rotate(324 24 24)"/>
+        </g>
+      </symbol>
+
+      <!-- Ramo de laranjeira com folhas -->
+      <symbol id="svg-ramo" viewBox="0 0 64 64">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 56 C 22 46 32 34 40 20 C 42 16.5 44 13 46 10"/>
+          <path d="M26 40 C 20 36 14 36 9 39 C 13 44 20 45 26 40 Z"/>
+          <path d="M26 40 C 22.5 39 16.5 38.5 12.5 40.2"/>
+          <path d="M35 27 C 30 21.5 24.5 20 19 21.5 C 22 27.5 29 30 35 27 Z"/>
+          <path d="M35 27 C 30.5 24.5 25 22.8 21.5 22.8"/>
+          <path d="M40 20 C 41.5 13 46 8 52.5 6.5 C 53 13.5 48.5 19 40 20 Z"/>
+          <path d="M40 20 C 44 15.5 48.5 11 50.5 9.2"/>
+          <circle cx="52" cy="22" r="1.6"/>
+          <path d="M46 10 C 48.5 12.5 51 17 52 20.4"/>
+        </g>
+      </symbol>
+
+      <!-- Laranja inteira com folhinhas -->
+      <symbol id="svg-laranja" viewBox="0 0 48 48">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="27" r="13"/>
+          <path d="M24 14 C 23.6 11.5 22.6 9.6 20.8 8"/>
+          <path d="M24 13.6 C 27.5 8 33 6.5 38 8 C 36 13 30.5 15.5 24.8 13.9 Z"/>
+          <path d="M24.8 13.9 C 28.5 11.5 32.5 9.7 35.5 9.2"/>
+          <circle cx="19" cy="23.5" r="0.4"/>
+          <circle cx="28" cy="31" r="0.4"/>
+          <circle cx="22" cy="32.5" r="0.4"/>
+          <circle cx="29.5" cy="23" r="0.4"/>
+        </g>
+      </symbol>
+
+      <!-- Laranja em fatia -->
+      <symbol id="svg-fatia" viewBox="0 0 48 48">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="24" r="14"/>
+          <circle cx="24" cy="24" r="10.6"/>
+          <line x1="24" y1="13.4" x2="24" y2="34.6"/>
+          <line x1="13.4" y1="24" x2="34.6" y2="24"/>
+          <line x1="16.5" y1="16.5" x2="31.5" y2="31.5"/>
+          <line x1="31.5" y1="16.5" x2="16.5" y2="31.5"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ================================================================
+       NAVEGAÇÃO
+       ================================================================ -->
+  <header class="nav" id="nav">
+    <a class="nav__brand" href="#inicio" id="nav-brand" aria-label="Voltar ao início"></a>
+    <nav class="nav__links" id="nav-links" aria-label="Seções do site"></nav>
+    <button class="nav__burger" id="nav-burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <!-- Menu mobile de tela cheia -->
+  <div class="menu" id="menu-mobile" hidden>
+    <nav class="menu__links" id="menu-links" aria-label="Seções do site"></nav>
+  </div>
+
+  <main>
+
+    <!-- ==========================================================
+         1 · HERO
+         ========================================================== -->
+    <section class="hero" id="inicio">
+      <div class="hero__inner">
+        <p class="hero__eyebrow" id="hero-eyebrow"></p>
+        <div class="hero__stage" id="hero-stage">
+          <h1 class="hero__wordmark" id="hero-wordmark"></h1>
+          <div class="hero__video-wrap" id="hero-video-wrap"></div>
+        </div>
+        <p class="hero__date" id="hero-date"></p>
+      </div>
+      <a class="hero__scroll" href="#historia" aria-label="Rolar para a próxima seção">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 4 v14 M6 13 l6 6 6-6"/>
+        </svg>
+      </a>
+    </section>
+
+    <!-- ==========================================================
+         2 · NOSSA HISTÓRIA
+         ========================================================== -->
+    <section class="historia section" id="historia">
+      <div class="section__inner historia__grid">
+        <figure class="historia__media reveal" id="historia-media">
+          <img id="historia-img" alt="" loading="lazy">
+        </figure>
+        <div class="historia__texto reveal">
+          <h2 class="section__title" id="historia-titulo"></h2>
+          <p class="assinatura" id="historia-assinatura" aria-hidden="true"></p>
+          <div id="historia-paragrafos"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+    </div>
+
+    <!-- ==========================================================
+         3 · GALERIA
+         ========================================================== -->
+    <section class="galeria section" id="galeria">
+      <div class="section__inner">
+        <h2 class="section__title reveal" id="galeria-titulo"></h2>
+        <div class="galeria__grid" id="galeria-grid"></div>
+      </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+    </div>
+
+    <!-- ==========================================================
+         4 · O DIA
+         ========================================================== -->
+    <section class="odia section section--elevated" id="o-dia">
+      <div class="section__inner">
+        <h2 class="section__title reveal" id="odia-titulo"></h2>
+        <p class="section__intro reveal" id="odia-intro"></p>
+        <div class="odia__grid">
+          <article class="odia__bloco reveal">
+            <svg class="odia__icone" aria-hidden="true"><use href="#svg-flor"/></svg>
+            <h3 class="odia__rotulo" id="odia-rotulo-data"></h3>
+            <p class="odia__valor" id="odia-data"></p>
+          </article>
+          <article class="odia__bloco reveal">
+            <svg class="odia__icone" aria-hidden="true"><use href="#svg-fatia"/></svg>
+            <h3 class="odia__rotulo" id="odia-rotulo-horario"></h3>
+            <p class="odia__valor" id="odia-horario"></p>
+            <p class="odia__nota" id="odia-horario-nota"></p>
+          </article>
+          <article class="odia__bloco reveal">
+            <svg class="odia__icone" aria-hidden="true"><use href="#svg-ramo"/></svg>
+            <h3 class="odia__rotulo" id="odia-rotulo-local"></h3>
+            <p class="odia__valor" id="odia-local-nome"></p>
+            <p class="odia__nota" id="odia-local-endereco"></p>
+            <a class="botao botao--outline" id="odia-mapa" target="_blank" rel="noopener"></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+    </div>
+
+    <!-- ==========================================================
+         5 · PRESENTES
+         ========================================================== -->
+    <section class="presentes section" id="presentes">
+      <div class="section__inner section__inner--narrow">
+        <h2 class="section__title reveal" id="presentes-titulo"></h2>
+        <p class="section__intro reveal" id="presentes-texto"></p>
+        <div class="pix-card reveal" id="pix-card">
+          <svg class="pix-card__icone" aria-hidden="true"><use href="#svg-laranja"/></svg>
+          <dl class="pix-card__dados">
+            <div><dt id="pix-rotulo-banco"></dt><dd id="pix-banco"></dd></div>
+            <div><dt id="pix-rotulo-titular"></dt><dd id="pix-titular"></dd></div>
+            <div><dt id="pix-rotulo-chave"></dt><dd class="pix-card__chave" id="pix-chave"></dd></div>
+          </dl>
+          <figure class="pix-card__qr" id="pix-qr" hidden>
+            <img id="pix-qr-img" alt="" loading="lazy">
+          </figure>
+          <button class="botao botao--pix" id="pix-copiar" type="button"></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider" aria-hidden="true">
+      <svg class="divider__icon"><use href="#svg-flor"/></svg>
+    </div>
+
+    <!-- ==========================================================
+         6 · RSVP
+         ========================================================== -->
+    <section class="rsvp section" id="rsvp">
+      <div class="section__inner section__inner--narrow">
+        <h2 class="section__title reveal" id="rsvp-titulo"></h2>
+        <p class="section__intro reveal" id="rsvp-intro"></p>
+
+        <form class="rsvp__form reveal" id="rsvp-form" novalidate>
+          <div class="campo">
+            <label class="campo__rotulo" for="rsvp-nome" id="rsvp-rotulo-nome"></label>
+            <input class="campo__input" type="text" id="rsvp-nome" name="nome" autocomplete="name" required>
+          </div>
+
+          <div class="campo campo--stepper">
+            <span class="campo__rotulo" id="rsvp-rotulo-acomp"></span>
+            <div class="stepper" role="group" aria-labelledby="rsvp-rotulo-acomp">
+              <button class="stepper__botao" type="button" id="rsvp-menos" aria-label="Diminuir acompanhantes">&minus;</button>
+              <input class="stepper__valor" id="rsvp-acomp" name="acompanhantes" type="text" inputmode="numeric" value="0" readonly aria-live="polite">
+              <button class="stepper__botao" type="button" id="rsvp-mais" aria-label="Aumentar acompanhantes">+</button>
+            </div>
+            <span class="campo__nota" id="rsvp-nota-acomp"></span>
+          </div>
+
+          <div class="campo">
+            <label class="campo__rotulo" for="rsvp-obs" id="rsvp-rotulo-obs"></label>
+            <textarea class="campo__input campo__input--area" id="rsvp-obs" name="observacoes" rows="3"></textarea>
+          </div>
+
+          <button class="botao botao--primario" id="rsvp-enviar" type="submit"></button>
+        </form>
+
+        <div class="rsvp__sucesso" id="rsvp-sucesso" hidden tabindex="-1">
+          <svg class="rsvp__sucesso-icone" aria-hidden="true"><use href="#svg-flor"/></svg>
+          <h3 id="rsvp-sucesso-titulo"></h3>
+          <p id="rsvp-sucesso-texto"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================================================================
+       RODAPÉ
+       ================================================================ -->
+  <footer class="rodape">
+    <svg class="rodape__ramo" aria-hidden="true"><use href="#svg-ramo"/></svg>
+    <p class="rodape__nomes" id="rodape-nomes"></p>
+    <p class="rodape__agradecimento" id="rodape-agradecimento"></p>
+    <p class="rodape__data" id="rodape-data"></p>
+    <p class="rodape__credito" id="rodape-credito"></p>
+  </footer>
+
+  <!-- ================================================================
+       LIGHTBOX DA GALERIA
+       ================================================================ -->
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Foto ampliada">
+    <button class="lightbox__fechar" id="lightbox-fechar" aria-label="Fechar (Esc)">&times;</button>
+    <button class="lightbox__seta lightbox__seta--ant" id="lightbox-ant" aria-label="Foto anterior">&larr;</button>
+    <img class="lightbox__img" id="lightbox-img" alt="">
+    <button class="lightbox__seta lightbox__seta--prox" id="lightbox-prox" aria-label="Próxima foto">&rarr;</button>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,952 @@
+/* ==========================================================================
+   LUCAS & CAROL — SISTEMA "LARANJEIRA EDITORIAL"
+   --------------------------------------------------------------------------
+   Todos os tokens de estilo vivem em :root. Trocar a paleta inteira do site
+   exige editar apenas este bloco.
+   Regras do sistema: zero drop-shadows (profundidade = passos de luminância),
+   acento laranja raro, divisores hairline tracejados, motivo botânico único.
+   ========================================================================== */
+
+/* --- Fontes self-hosted (variáveis, subset latino, display swap) ------- */
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("../assets/fonts/cormorant-garamond.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Jost";
+  src: url("../assets/fonts/jost.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ephesis";
+  src: url("../assets/fonts/ephesis.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* --- Cores ---------------------------------------------------------- */
+  --paper-video: #CDBCA6;      /* fundo do hero — idêntico ao vídeo (inegociável) */
+  --paper: #F4EAD9;            /* canvas das seções de conteúdo */
+  --paper-elevated: #FBF5EA;   /* cartões e superfícies elevadas */
+  --ink: #3A2E20;              /* texto principal */
+  --ink-soft: #6C5F51;         /* texto secundário e legendas */
+  --sage: #8FA080;             /* verde-sálvia: detalhes botânicos */
+  --sage-deep: #5C6B4F;        /* verde profundo: botão primário, contraste */
+  --blossom-orange: #E08A4F;   /* O ACENTO: traços, bordas e preenchimentos raros */
+  --blossom-orange-ink: #9C4E1D; /* laranja escurecido p/ TEXTO (contraste AA) */
+  --hairline: #D8CBB4;         /* divisores tracejados 1px */
+
+  /* --- Tipografia ------------------------------------------------------ */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Jost", system-ui, sans-serif;
+  --font-script: "Ephesis", cursive;
+
+  /* --- Métricas -------------------------------------------------------- */
+  --nav-height: 64px;
+  --stage-max: 1200px;         /* largura máxima do vídeo do hero em desktop */
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  /* Posição/escala do wordmark no hero, calibradas contra o frame final
+     do vídeo (hero-poster.jpg). Ajuste fino apenas se trocar o vídeo. */
+  --wm-top: 15%;
+  --wm-size: 13.3cqw;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --nav-height: 72px;
+    --wm-top: 16.5%;
+    --wm-size: 6.15cqw;
+  }
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 1100px) {
+  body { font-size: 18px; }
+}
+
+img, svg, video { display: block; }
+
+a { color: inherit; }
+
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--sage);
+  color: var(--paper-elevated);
+}
+
+body.menu-aberto { overflow: hidden; }
+
+/* ==========================================================================
+   NAVEGAÇÃO
+   ========================================================================== */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 80;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: clamp(20px, 4vw, 48px);
+  background: transparent;
+  border-bottom: 1px dashed transparent;
+  transition: background-color .35s ease, border-color .35s ease;
+}
+
+.nav.is-scrolled {
+  background: var(--paper);
+  border-bottom-color: var(--hairline);
+}
+
+.nav__brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: .14em;
+  text-decoration: none;
+}
+
+.nav__links {
+  display: none;
+  gap: clamp(20px, 2.6vw, 36px);
+}
+
+.nav__links a {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding-block: 6px;
+  border-bottom: 1px dashed transparent;
+  transition: border-color .25s ease, color .25s ease;
+}
+
+.nav__links a:hover { color: var(--sage-deep); }
+
+.nav__links a.is-active {
+  border-bottom-color: var(--blossom-orange);
+}
+
+/* Hambúrguer minimalista */
+.nav__burger {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 10px 6px;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+}
+
+.nav__burger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: var(--ink);
+  transition: transform .3s ease;
+}
+
+.nav__burger[aria-expanded="true"] span:first-child {
+  transform: translateY(3.75px) rotate(45deg);
+}
+.nav__burger[aria-expanded="true"] span:last-child {
+  transform: translateY(-3.75px) rotate(-45deg);
+}
+
+@media (min-width: 860px) {
+  .nav__links { display: flex; }
+  .nav__burger { display: none; }
+}
+
+/* Menu mobile de tela cheia */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: var(--paper);
+  display: grid;
+  place-items: center;
+}
+
+.menu__links {
+  display: grid;
+  gap: clamp(22px, 4.5vh, 36px);
+  text-align: center;
+}
+
+.menu__links a {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(26px, 6.5vw, 34px);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+}
+
+.menu__links a.is-active {
+  border-bottom-color: var(--blossom-orange);
+}
+
+/* ==========================================================================
+   1 · HERO
+   ========================================================================== */
+
+.hero {
+  min-height: 100svh;
+  background: var(--paper-video);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(18px, 3vh, 30px);
+  padding: calc(var(--nav-height) + 16px) clamp(16px, 3vw, 40px) 96px;
+  position: relative;
+}
+
+.hero__inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 3vh, 30px);
+}
+
+.hero__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* Palco do vídeo: nunca passa de 1200px em desktop (limite de qualidade
+   do upscale) e nunca estoura a altura útil da tela. */
+.hero__stage {
+  position: relative;
+  container-type: inline-size;
+  width: min(100%, calc((100svh - 250px) * .6667));
+}
+
+@media (min-width: 768px) {
+  .hero__stage {
+    width: min(100%, var(--stage-max), calc((100svh - 265px) * 1.7778));
+  }
+}
+
+/* O nome fica SOB o vídeo em movimento e SOB o recorte da flor no estado
+   final — as pétalas passam à frente das letras (profundidade real). */
+.hero__wordmark {
+  position: absolute;
+  top: var(--wm-top);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: var(--wm-size);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.hero__video-wrap {
+  position: relative;
+  z-index: 1;
+  /* Máscara de emenda: torna invisível a fronteira vídeo/fundo.
+     (Raios de 46%/44% da caixa = elipse de 92%×88% do quadro, com fade
+     de 62% a 98% — calibrado visualmente contra o frame final.) */
+  -webkit-mask-image: radial-gradient(ellipse 46% 44% at center, #000 62%, transparent 98%);
+  mask-image: radial-gradient(ellipse 46% 44% at center, #000 62%, transparent 98%);
+}
+
+.hero__video-wrap video,
+.hero__video-wrap img {
+  width: 100%;
+  height: auto;
+}
+
+/* Recorte da flor (frame final com transparência): entra por cima do nome
+   quando o vídeo congela, criando a sobreposição pétalas > letras. */
+.hero__cutout {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+  -webkit-mask-image: radial-gradient(ellipse 46% 44% at center, #000 62%, transparent 98%);
+  mask-image: radial-gradient(ellipse 46% 44% at center, #000 62%, transparent 98%);
+  pointer-events: none;
+}
+
+.hero__stage.is-frozen .hero__cutout { opacity: 1; }
+
+/* Entrada do hero: fade + leve zoom-out, sincronizados com o início do
+   crescimento do galho (disparados quando o vídeo começa a tocar). */
+.hero__stage { opacity: 0; }
+
+.hero__stage.is-ready { opacity: 1; }
+
+.hero__stage.is-playing {
+  animation: hero-fade 2s ease forwards;
+}
+
+.hero__stage.is-playing video {
+  animation: hero-zoom 2s ease forwards;
+}
+
+@keyframes hero-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes hero-zoom {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1); }
+}
+
+.hero__date {
+  margin: 0;
+  position: relative;
+  z-index: 4;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .3em;
+  color: var(--ink);
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--ink-soft);
+  padding: 10px;
+  animation: scroll-bob 2.6s ease-in-out infinite;
+}
+
+@keyframes scroll-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 7px); }
+}
+
+/* ==========================================================================
+   SEÇÕES — ESTRUTURA COMUM
+   ========================================================================== */
+
+.section {
+  padding: clamp(72px, 11vh, 120px) clamp(20px, 5vw, 48px);
+  scroll-margin-top: calc(var(--nav-height) + 4px);
+}
+
+.section--elevated { background: var(--paper-elevated); }
+
+.section__inner {
+  max-width: 1160px;
+  margin-inline: auto;
+}
+
+.section__inner--narrow { max-width: 680px; }
+
+.section__title {
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(30px, 4.5vw, 56px);
+  line-height: 1;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.section__intro {
+  margin: 0 0 40px;
+  color: var(--ink-soft);
+  max-width: 58ch;
+}
+
+/* Divisor hairline tracejado com a flor de laranjeira ao centro */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 1160px;
+  margin-inline: auto;
+  padding-inline: clamp(20px, 5vw, 48px);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--hairline);
+}
+
+.divider__icon {
+  width: 22px;
+  height: 22px;
+  color: var(--blossom-orange);
+}
+
+/* O divisor entre a seção elevada e a seguinte herda o mesmo canvas */
+.section--elevated + .divider { background: transparent; }
+
+/* Entradas suaves (IntersectionObserver adiciona .is-visible) */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   BOTÕES (pill · sem sombras)
+   ========================================================================== */
+
+.botao {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  padding: 14px 34px;
+  cursor: pointer;
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+}
+
+/* Único botão preenchido verde do site */
+.botao--primario {
+  border: 0;
+  background: var(--sage-deep);
+  color: var(--paper-elevated);
+  width: 100%;
+}
+
+.botao--primario:hover {
+  background: color-mix(in srgb, var(--sage-deep) 86%, #000);
+}
+
+.botao--primario[disabled] {
+  opacity: .7;
+  cursor: wait;
+}
+
+/* Outline laranja: link do mapa e copiar PIX */
+.botao--outline,
+.botao--pix {
+  background: transparent;
+  border: 1px solid var(--blossom-orange);
+  color: var(--blossom-orange-ink);
+}
+
+.botao--outline:hover,
+.botao--pix:hover {
+  background: color-mix(in srgb, var(--blossom-orange) 14%, transparent);
+}
+
+/* Feedback de cópia: preenche laranja por 2s (único laranja preenchido) */
+.botao--pix.is-copied {
+  background: var(--blossom-orange);
+  border-color: var(--blossom-orange);
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   2 · NOSSA HISTÓRIA
+   ========================================================================== */
+
+.historia__grid {
+  display: grid;
+  gap: clamp(36px, 6vw, 88px);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .historia__grid { grid-template-columns: 5fr 6fr; }
+}
+
+.historia__media {
+  margin: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+}
+
+.historia__media img {
+  width: 100%;
+  height: 118%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.historia__texto p:not(.assinatura) {
+  margin: 0 0 1.2em;
+  color: var(--ink);
+}
+
+.assinatura {
+  margin: 0 0 28px;
+  font-family: var(--font-script);
+  font-size: clamp(28px, 3.4vw, 38px);
+  line-height: 1.1;
+  color: var(--sage-deep);
+}
+
+/* ==========================================================================
+   3 · GALERIA
+   ========================================================================== */
+
+.galeria__grid {
+  columns: 2;
+  column-gap: 14px;
+}
+
+@media (min-width: 900px)  { .galeria__grid { columns: 3; } }
+@media (min-width: 1280px) { .galeria__grid { columns: 4; } }
+
+.galeria__item {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  display: block;
+  width: 100%;
+  margin: 0 0 14px;
+  break-inside: avoid;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  cursor: zoom-in;
+  position: relative;
+}
+
+.galeria__item img {
+  width: 100%;
+  height: auto;
+  transition: transform .5s ease;
+}
+
+@media (hover: hover) {
+  .galeria__item:hover img { transform: scale(1.02); }
+}
+
+/* Flor discreta no canto do primeiro cartão — peça única, intencional */
+.galeria__item .galeria__flor {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 20px;
+  height: 20px;
+  color: var(--paper-elevated);
+  opacity: .9;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   4 · O DIA
+   ========================================================================== */
+
+.odia__grid {
+  display: grid;
+  gap: clamp(40px, 6vw, 56px);
+  text-align: center;
+  margin-top: 24px;
+}
+
+@media (min-width: 900px) {
+  .odia__grid { grid-template-columns: 1fr 1fr 1fr; align-items: start; }
+}
+
+.odia .section__title,
+.odia .section__intro {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.odia__bloco { display: grid; justify-items: center; gap: 6px; }
+
+.odia__icone {
+  width: 46px;
+  height: 46px;
+  color: var(--sage-deep);
+  margin-bottom: 10px;
+}
+
+.odia__rotulo {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.odia__valor {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(24px, 2.6vw, 30px);
+  line-height: 1.2;
+}
+
+.odia__nota {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-soft);
+  max-width: 34ch;
+}
+
+.odia__bloco .botao { margin-top: 16px; }
+
+/* ==========================================================================
+   5 · PRESENTES
+   ========================================================================== */
+
+.presentes .section__title,
+.presentes .section__intro {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.pix-card {
+  background: var(--paper-elevated);
+  border-radius: var(--radius-card);
+  padding: clamp(30px, 6vw, 52px);
+  display: grid;
+  justify-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.pix-card__icone {
+  width: 44px;
+  height: 44px;
+  color: var(--sage-deep);
+}
+
+.pix-card__dados {
+  margin: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.pix-card__dados dt {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+
+.pix-card__dados dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.pix-card__dados dd.pix-card__chave {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  word-break: break-all;
+}
+
+.pix-card__qr { margin: 0; }
+
+.pix-card__qr img {
+  width: min(180px, 60vw);
+  border-radius: var(--radius-card);
+}
+
+/* ==========================================================================
+   6 · RSVP
+   ========================================================================== */
+
+.rsvp .section__title,
+.rsvp .section__intro {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.rsvp__form {
+  display: grid;
+  gap: 34px;
+  margin-top: 8px;
+}
+
+.campo { display: grid; gap: 8px; }
+
+.campo__rotulo {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Inputs sem caixa: apenas linha inferior */
+.campo__input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ink-soft);
+  border-radius: 0;
+  padding: 10px 2px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  color: var(--ink);
+  transition: border-color .25s ease;
+}
+
+.campo__input:focus {
+  outline: none;
+  border-bottom-color: var(--sage-deep);
+}
+
+.campo__input--area { resize: vertical; min-height: 72px; }
+
+.campo__input::placeholder { color: color-mix(in srgb, var(--ink-soft) 72%, var(--paper)); }
+
+.campo__nota { font-size: 13px; color: var(--ink-soft); }
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stepper__botao {
+  appearance: none;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--ink-soft);
+  background: transparent;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .25s ease, color .25s ease;
+}
+
+.stepper__botao:hover {
+  border-color: var(--sage-deep);
+  color: var(--sage-deep);
+}
+
+.stepper__valor {
+  width: 56px;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.rsvp__sucesso {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding-block: 24px;
+}
+
+.rsvp__sucesso-icone {
+  width: 52px;
+  height: 52px;
+  color: var(--sage-deep);
+  margin-bottom: 8px;
+}
+
+.rsvp__sucesso h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: .04em;
+}
+
+.rsvp__sucesso p {
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+
+/* ==========================================================================
+   RODAPÉ
+   ========================================================================== */
+
+.rodape {
+  background: var(--sage-deep);
+  color: var(--paper);
+  text-align: center;
+  padding: 72px 24px 30px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.rodape__ramo {
+  width: 72px;
+  height: 72px;
+  color: var(--paper);
+  opacity: .3;
+  margin-bottom: 6px;
+}
+
+.rodape__nomes {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: clamp(42px, 6vw, 58px);
+  line-height: 1.15;
+}
+
+.rodape__agradecimento {
+  margin: 0;
+  max-width: 44ch;
+}
+
+.rodape__data {
+  margin: 10px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+
+.rodape__credito {
+  margin: 42px 0 0;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   LIGHTBOX
+   ========================================================================== */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(244, 234, 217, .96);
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 48px);
+}
+
+.lightbox__img {
+  max-width: min(100%, 1080px);
+  max-height: 82vh;
+  width: auto;
+  border-radius: var(--radius-card);
+}
+
+.lightbox__fechar,
+.lightbox__seta {
+  position: absolute;
+  appearance: none;
+  border: 1px solid var(--hairline);
+  background: var(--paper-elevated);
+  color: var(--ink);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .25s ease, color .25s ease;
+}
+
+.lightbox__fechar:hover,
+.lightbox__seta:hover {
+  border-color: var(--sage-deep);
+  color: var(--sage-deep);
+}
+
+.lightbox__fechar { top: 20px; right: 20px; }
+
+.lightbox__seta { top: 50%; transform: translateY(-50%); }
+.lightbox__seta--ant  { left: 16px; }
+.lightbox__seta--prox { right: 16px; }
+
+/* ==========================================================================
+   MOVIMENTO REDUZIDO — todas as animações respeitam a preferência
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .hero__stage,
+  .hero__stage.is-playing { animation: none; opacity: 1; }
+  .hero__stage.is-playing video { animation: none; }
+  .hero__cutout { transition: none; }
+  .hero__scroll { animation: none; }
+  .galeria__item img { transition: none; }
+}
