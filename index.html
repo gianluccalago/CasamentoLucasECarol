@@ -158,24 +158,29 @@
     <!-- ==========================================================
          1 · HERO
          ========================================================== -->
+    <!-- O hero é mais alto que a tela: o miolo fica "pinado" (sticky) e o
+         desabrochar do vídeo avança conforme a rolagem — sem autoplay,
+         sem botão de play, funciona igual em desktop e mobile. -->
     <section class="hero" id="inicio">
-      <div class="hero__inner">
-        <p class="hero__eyebrow" id="hero-eyebrow"></p>
-        <div class="hero__stage" id="hero-stage">
-          <h1 class="hero__wordmark" id="hero-wordmark"></h1>
-          <div class="hero__video-wrap" id="hero-video-wrap"></div>
+      <div class="hero__pin">
+        <div class="hero__inner">
+          <p class="hero__eyebrow" id="hero-eyebrow"></p>
+          <div class="hero__stage" id="hero-stage">
+            <h1 class="hero__wordmark" id="hero-wordmark"></h1>
+            <div class="hero__video-wrap" id="hero-video-wrap"></div>
+          </div>
+          <p class="hero__date">
+            <svg class="hero__date-flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+            <span id="hero-date"></span>
+            <svg class="hero__date-flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+          </p>
         </div>
-        <p class="hero__date">
-          <svg class="hero__date-flor" aria-hidden="true"><use href="#svg-flor"/></svg>
-          <span id="hero-date"></span>
-          <svg class="hero__date-flor" aria-hidden="true"><use href="#svg-flor"/></svg>
-        </p>
+        <a class="hero__scroll" href="#historia" aria-label="Rolar para a próxima seção">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 4 v14 M6 13 l6 6 6-6"/>
+          </svg>
+        </a>
       </div>
-      <a class="hero__scroll" href="#historia" aria-label="Rolar para a próxima seção">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 4 v14 M6 13 l6 6 6-6"/>
-        </svg>
-      </a>
     </section>
 
     <!-- ==========================================================

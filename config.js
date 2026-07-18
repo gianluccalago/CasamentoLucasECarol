@@ -62,15 +62,21 @@ const SITE = {
      Só altere estes caminhos se trocar os arquivos de lugar.
      ------------------------------------------------------------------ */
   heroVideo: {
+    // O desabrochar avança conforme a rolagem da página (sem autoplay).
+    // O MP4 é a fonte principal; o WebM é reserva para navegadores raros.
     desktopMp4:  "assets/video/hero-flor-final.mp4",
     desktopWebm: "assets/video/hero-flor-final.webm",
     mobileMp4:   "assets/video/hero-flor-mobile.mp4",
     mobileWebm:  "assets/video/hero-flor-mobile.webm",
-    // Imagem do último quadro (flor aberta): usada como capa/fallback.
+    // Primeiro quadro (galho fechado): capa exibida antes do vídeo carregar.
+    posterInicioDesktop: "assets/img/hero-poster-inicio.jpg",
+    posterInicioMobile:  "assets/img/hero-poster-inicio-mobile.jpg",
+    // Último quadro (flor aberta): usado com "movimento reduzido" e como
+    // reserva se o vídeo não carregar.
     posterDesktop: "assets/img/hero-poster.jpg",
     posterMobile:  "assets/img/hero-poster-mobile.jpg",
     // Descrição do vídeo para leitores de tela.
-    descricao: "Um galho de laranjeira cresce e sua flor branca desabrocha lentamente.",
+    descricao: "Um galho de laranjeira cresce e sua flor branca desabrocha conforme a página rola.",
   },
 
   /* ------------------------------------------------------------------

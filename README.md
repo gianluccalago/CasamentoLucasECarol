@@ -39,20 +39,23 @@ o envio e nenhuma resposta é gravada.
 
 ## O vídeo do hero
 
+O desabrochar é **conduzido pela rolagem da página**: o miolo do hero fica
+fixo (sticky) enquanto o scroll percorre a linha do tempo do vídeo. Nunca
+chamamos `play()` — por isso não existe botão de play nem bloqueio de
+autoplay (inclusive no modo de economia de energia do iPhone). O nome
+"Lucas & Carol" fica sempre por cima, nunca é coberto.
+
 Os arquivos em `assets/video/` foram gerados a partir do vídeo original com:
 
 1. Crop `1120×630` (remove a marca d'água do canto inferior direito, medida
    em x≈1136–1185, y≈575–625, mantendo 16:9 exato);
 2. Upscale para 1920×1080 com `lanczos` + `unsharp=5:5:0.4` (por isso o
    vídeo nunca é renderizado acima de 1200px de largura no desktop);
-3. Export H.264 CRF 20 `+faststart` e WebM VP9 como fonte alternativa;
-4. Versão mobile 720×1080 (recorte vertical central) + pôsteres do último
-   quadro (`hero-poster*.jpg`).
-
-O vídeo toca **uma vez** e congela no último quadro. No congelamento, um
-recorte com transparência do frame final (`hero-flor-cutout*.webp`, gerado
-por subtração de fundo usando o primeiro quadro como plate) sobe à frente do
-nome "Lucas & Carol" — é isso que faz pétalas e folhas sobreporem as letras.
+3. Export H.264 `+faststart` com **keyframe em todo frame** (`-g 1`) —
+   obrigatório para o scrub por scroll ser instantâneo;
+4. Versão mobile 720×1080 (recorte vertical central) + pôsteres do primeiro
+   quadro (`hero-poster-inicio*.jpg`, capa) e do último (`hero-poster*.jpg`,
+   usado com "movimento reduzido" e como reserva).
 
 ## Publicação
 

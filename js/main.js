@@ -137,81 +137,119 @@
   }
 
   /* ------------------------------------------------------------------
-     HERO: vídeo que toca uma vez e congela; recorte da flor entra por
-     cima do nome no estado final (profundidade pétalas > letras).
+     HERO: o desabrochar é conduzido pela ROLAGEM da página.
+     Nunca chamamos play() — por isso não existe botão de play nem
+     bloqueio de autoplay (inclusive no modo de economia de energia do
+     iPhone). O vídeo é só uma linha do tempo que o scroll percorre.
      ------------------------------------------------------------------ */
   function montarHero() {
+    var hero = document.getElementById("inicio");
     var stage = $("hero-stage");
     var wrap = $("hero-video-wrap");
     var cfg = SITE.heroVideo;
-    var poster = ehMobile ? cfg.posterMobile : cfg.posterDesktop;
-    var cutoutSrc = ehMobile ? "assets/img/hero-flor-cutout-mobile.webp"
-                             : "assets/img/hero-flor-cutout.webp";
+    var posterInicio = ehMobile ? cfg.posterInicioMobile : cfg.posterInicioDesktop;
+    var posterFinal = ehMobile ? cfg.posterMobile : cfg.posterDesktop;
 
-    // Camada de profundidade: frame final recortado, acima do nome.
-    var cutout = document.createElement("img");
-    cutout.className = "hero__cutout";
-    cutout.src = cutoutSrc;
-    cutout.alt = "";
-    cutout.setAttribute("aria-hidden", "true");
-    stage.appendChild(cutout);
-
-    function congelar() {
-      stage.classList.add("is-frozen");
-    }
-
-    // Com movimento reduzido: apenas o pôster estático, já com profundidade.
-    if (reduzMovimento) {
+    function somenteImagem(src) {
+      wrap.textContent = "";
       var img = document.createElement("img");
-      img.src = poster;
+      img.src = src;
       img.alt = cfg.descricao;
       wrap.appendChild(img);
       stage.classList.add("is-ready");
-      congelar();
+    }
+
+    // Com movimento reduzido: apenas a flor aberta, estática.
+    if (reduzMovimento) {
+      somenteImagem(posterFinal);
       return;
     }
+
+    hero.classList.add("hero--scrub");
 
     var video = document.createElement("video");
     video.muted = true;
     video.setAttribute("muted", "");
-    video.autoplay = true;
     video.playsInline = true;
     video.setAttribute("playsinline", "");
-    video.preload = "metadata";
+    video.preload = "auto";
+    video.poster = posterInicio;
     video.disablePictureInPicture = true;
     video.setAttribute("aria-label", cfg.descricao);
-    // SEM loop: o desabrochar é um evento único. O vídeo termina e congela
-    // sozinho no último quadro; nunca reinicia nem reverte.
 
-    var srcWebm = document.createElement("source");
-    srcWebm.src = ehMobile ? cfg.mobileWebm : cfg.desktopWebm;
-    srcWebm.type = "video/webm";
+    // MP4 primeiro (universal); WebM como reserva de codec.
     var srcMp4 = document.createElement("source");
     srcMp4.src = ehMobile ? cfg.mobileMp4 : cfg.desktopMp4;
     srcMp4.type = "video/mp4";
-    video.appendChild(srcWebm);
+    var srcWebm = document.createElement("source");
+    srcWebm.src = ehMobile ? cfg.mobileWebm : cfg.desktopWebm;
+    srcWebm.type = "video/webm";
     video.appendChild(srcMp4);
-
-    video.addEventListener("playing", function () {
-      stage.classList.add("is-playing");
-    }, { once: true });
-
-    video.addEventListener("ended", function () {
-      video.pause();
-      congelar();
-    }, { once: true });
-
+    video.appendChild(srcWebm);
     wrap.appendChild(video);
 
-    var tocar = video.play();
-    if (tocar && tocar.catch) {
-      tocar.catch(function () {
-        // Autoplay bloqueado: mostra o pôster (flor aberta) já congelado.
-        video.poster = poster;
-        stage.classList.add("is-ready");
-        congelar();
-      });
+    // Se NENHUMA fonte tocar (o erro dispara na última), mostra a flor
+    // aberta e libera a rolagem normal.
+    srcWebm.addEventListener("error", function () {
+      hero.classList.remove("hero--scrub");
+      somenteImagem(posterFinal);
+    });
+
+    var duracao = 0;
+    var atual = null;   // posição atual (suavizada) na linha do tempo
+    var agendado = false;
+
+    function progresso() {
+      var total = hero.offsetHeight - window.innerHeight;
+      if (total <= 0) return 1;
+      var passado = -hero.getBoundingClientRect().top;
+      return Math.min(1, Math.max(0, passado / total));
     }
+
+    function quadro() {
+      agendado = false;
+      if (!duracao) return;
+      var alvo = progresso() * (duracao - 0.06);
+      if (atual === null) atual = video.currentTime || 0;
+      var delta = alvo - atual;
+      if (Math.abs(delta) >= 0.004) {
+        // Suavização: aproxima do alvo aos poucos para o scrub ficar fluido.
+        atual = Math.abs(delta) < 0.03 ? alvo : atual + delta * 0.22;
+      }
+      // Aplica no vídeo se ele estiver fora da posição desejada. Enquanto o
+      // trecho ainda não bufferizou, o seek pode não "pegar" — seguimos
+      // tentando até o vídeo alcançar a posição.
+      var exibido = video.currentTime || 0;
+      if (Math.abs(exibido - atual) > 0.02) {
+        try { video.currentTime = Math.max(0, atual); } catch (e) { /* ainda carregando */ }
+      }
+      // Leve zoom-out conforme o desabrochar avança (1.04 → 1.0).
+      var escala = 1.04 - 0.04 * Math.min(1, atual / (duracao - 0.06));
+      video.style.transform = "scale(" + escala.toFixed(4) + ")";
+      if (Math.abs(alvo - atual) >= 0.004 || Math.abs(exibido - atual) > 0.08) {
+        agendar();
+      }
+    }
+
+    function agendar() {
+      if (!agendado) {
+        agendado = true;
+        requestAnimationFrame(quadro);
+      }
+    }
+
+    video.addEventListener("loadedmetadata", function () {
+      duracao = video.duration;
+      stage.classList.add("is-ready");
+      agendar();
+    });
+    // Conforme o download avança, novas faixas ficam bufferizadas —
+    // reavalia para aplicar seeks que ainda não tinham "pegado".
+    video.addEventListener("progress", agendar);
+    video.addEventListener("canplay", agendar);
+
+    window.addEventListener("scroll", agendar, { passive: true });
+    window.addEventListener("resize", agendar, { passive: true });
   }
 
   /* ------------------------------------------------------------------
@@ -223,8 +261,11 @@
     var menu = $("menu-mobile");
     var linksMenu = menu.querySelectorAll("a");
 
+    var hero = document.getElementById("inicio");
     function aoRolar() {
-      nav.classList.toggle("is-scrolled", window.scrollY > 24);
+      // A nav só ganha fundo depois que o hero (pinado pelo scrub) termina.
+      var limite = Math.max(24, hero.offsetHeight - window.innerHeight - 40);
+      nav.classList.toggle("is-scrolled", window.scrollY > limite);
     }
     window.addEventListener("scroll", aoRolar, { passive: true });
     aoRolar();
