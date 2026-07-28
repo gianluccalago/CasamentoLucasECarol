@@ -1,10 +1,10 @@
 /* ==========================================================================
    CONFIG.JS — CENTRAL DE CONTEÚDO DO SITE
    ==========================================================================
-   Este arquivo concentra TODOS os textos, nomes, datas, endereços, dados
-   do PIX e caminhos de imagens/vídeos do site. Para alterar qualquer
-   conteúdo, edite APENAS este arquivo — nada precisa ser mexido no HTML,
-   no CSS ou no restante do JavaScript.
+   Este arquivo concentra TODOS os textos, nomes, datas, endereço, dados do
+   PIX, lista de presentes e caminhos de fotos do site. Para alterar
+   qualquer conteúdo, edite APENAS este arquivo — nada precisa ser mexido
+   no HTML, no CSS ou no restante do JavaScript.
 
    DICAS PARA EDITAR SEM ERRO:
    - Mantenha os textos sempre entre aspas: "assim".
@@ -16,13 +16,13 @@
 const SITE = {
 
   /* ------------------------------------------------------------------
-     OS NOIVOS E A DATA
+     OS NOIVOS E O EVENTO
      ------------------------------------------------------------------ */
   casal: {
-    // Nome exibido no hero (topo) e no rodapé, em fonte manuscrita.
-    nomeCompleto: "Lucas & Carol",
-    // Iniciais exibidas na navegação (canto superior esquerdo).
-    monograma: "L & C",
+    // Nome exibido no hero (topo) e no rodapé, em letra manuscrita.
+    nomeCompleto: "Maria Carolina & Lucas",
+    // Versão curta, usada em espaços menores.
+    nomeCurto: "Carol & Lucas",
   },
 
   evento: {
@@ -30,163 +30,174 @@ const SITE = {
     chamada: "Vamos nos casar",
     // Data como aparece no hero, logo abaixo do vídeo.
     dataCurta: "16 . 01 . 2027",
-    // Data por extenso, usada na seção "O dia" e no rodapé.
+    // Data por extenso, usada na seção "O grande dia" e no rodapé.
     dataLonga: "16 de janeiro de 2027",
     // Horário da cerimônia.
-    horario: "16h",
-    // Complemento do horário exibido na seção "O dia".
+    horario: "16 horas",
+    // Complemento do horário exibido na seção "O grande dia".
     horarioNota: "Chegue com carinho e sem pressa — a cerimônia começa pontualmente.",
-    // Nome do espaço e cidade.
+    // Nome do espaço.
     localNome: "Espaço Querência",
-    localCidade: "São José dos Pinhais — PR",
-    // Endereço completo (editável). Aparece na seção "O dia".
-    localEndereco: "Espaço Querência, São José dos Pinhais, Paraná",
-    // Link do botão "VER NO MAPA". Cole aqui o link do Google Maps do local.
-    localMapaUrl: "https://www.google.com/maps/search/?api=1&query=Espa%C3%A7o+Quer%C3%AAncia+S%C3%A3o+Jos%C3%A9+dos+Pinhais+PR",
+    // Endereço completo, como no convite.
+    localEndereco: "R. Marina Coelho, 330 — Borda do Campo\nSão José dos Pinhais - PR, 83075-295",
+    // Link do botão "VER NO MAPA".
+    localMapaUrl: "https://www.google.com/maps/search/?api=1&query=R.+Marina+Coelho%2C+330+-+Borda+do+Campo%2C+S%C3%A3o+Jos%C3%A9+dos+Pinhais+-+PR%2C+83075-295",
+    // Versículo do convite (deixe "" para ocultar do rodapé).
+    versiculo: "“Nós amamos porque Ele nos amou primeiro”",
+    versiculoRef: "1 João 4:19",
   },
 
   /* ------------------------------------------------------------------
      NAVEGAÇÃO (rótulos do menu, em CAIXA ALTA automática)
      ------------------------------------------------------------------ */
   navegacao: [
-    { rotulo: "Nossa história", secao: "historia" },
-    { rotulo: "Galeria",        secao: "galeria" },
-    { rotulo: "O dia",          secao: "o-dia" },
-    { rotulo: "Presentes",      secao: "presentes" },
-    { rotulo: "RSVP",           secao: "rsvp" },
+    { rotulo: "Bem-vindos",   secao: "bem-vindos" },
+    { rotulo: "O grande dia", secao: "o-dia" },
+    { rotulo: "Presentes",    secao: "presentes" },
+    { rotulo: "Confirmar",    secao: "rsvp" },
   ],
 
   /* ------------------------------------------------------------------
-     VÍDEO DO HERO (a flor de laranjeira desabrochando)
-     Os arquivos já estão prontos na pasta assets/video.
-     Só altere estes caminhos se trocar os arquivos de lugar.
+     VÍDEO DO HERO (a aquarela da laranjeira sendo pintada)
+     O desabrochar avança conforme a rolagem da página.
      ------------------------------------------------------------------ */
   heroVideo: {
-    // O desabrochar avança conforme a rolagem da página (sem autoplay).
-    // O MP4 é a fonte principal; o WebM é reserva para navegadores raros.
+    // MP4 é a fonte principal; o WebM atende navegadores sem H.264.
     desktopMp4:  "assets/video/hero-flor-final.mp4",
     desktopWebm: "assets/video/hero-flor-final.webm",
     mobileMp4:   "assets/video/hero-flor-mobile.mp4",
     mobileWebm:  "assets/video/hero-flor-mobile.webm",
-    // Primeiro quadro (galho fechado): capa exibida antes do vídeo carregar.
+    // Primeiro quadro (papel em branco): capa antes do vídeo carregar.
     posterInicioDesktop: "assets/img/hero-poster-inicio.jpg",
     posterInicioMobile:  "assets/img/hero-poster-inicio-mobile.jpg",
-    // Último quadro (flor aberta): usado com "movimento reduzido" e como
-    // reserva se o vídeo não carregar.
+    // Último quadro (ilustração completa): usado com "movimento reduzido".
     posterDesktop: "assets/img/hero-poster.jpg",
     posterMobile:  "assets/img/hero-poster-mobile.jpg",
-    // Descrição do vídeo para leitores de tela.
-    descricao: "Um galho de laranjeira cresce e sua flor branca desabrocha conforme a página rola.",
+    descricao: "Ilustração em aquarela de um ramo de laranjeira com flores e frutos sendo pintado.",
   },
 
   /* ------------------------------------------------------------------
-     SEÇÃO: NOSSA HISTÓRIA
+     SEÇÃO 1: NOSSO GRANDE DIA (boas-vindas)
      ------------------------------------------------------------------ */
-  historia: {
-    titulo: "Nossa história",
-    // Palavra-âncora manuscrita que acompanha o título.
-    assinatura: "para sempre",
-    // Parágrafos do texto (cada item entre aspas é um parágrafo).
+  boasVindas: {
+    titulo: "Nosso grande dia",
+    subtitulo: "bem-vindos",
     paragrafos: [
-      "Tudo começou de um jeito simples, como as melhores coisas costumam começar: uma conversa que não queria terminar, um riso que ficou ecoando e a sensação boa de ter encontrado um lugar para chamar de casa.",
-      "No quintal da família da Carol existe uma laranjeira que floresce todo ano. Foi debaixo dela que entendemos o que estávamos plantando juntos — e é por isso que a flor de laranjeira abre este site e abrirá o nosso dia.",
+      "Estamos muito felizes em compartilhar este momento tão especial com vocês. A presença de cada pessoa que faz parte da nossa história torna este dia ainda mais significativo.",
+      "Criamos este espaço para reunir todas as informações sobre o casamento e facilitar a organização para nossos convidados. Esperamos que este seja um dia repleto de alegria, amor e boas lembranças.",
+      "Mal podemos esperar para celebrar com vocês!",
     ],
-    // Imagem da seção (troque pelo caminho da foto do casal).
-    // Ex.: "assets/img/nossa-historia.jpg" — proporção vertical 4:5 fica ideal.
-    imagem: "assets/img/placeholders/historia.svg",
-    imagemAlt: "Foto do casal Lucas e Carol",
+    /* FOTO DO PRÉ-WEDDING desta seção.
+       Troque pelo caminho da foto real, ex.: "assets/img/fotos/pre-01.jpg"
+       (proporção vertical 4:5 fica ideal). */
+    foto: "assets/img/placeholders/pre-01.svg",
+    fotoAlt: "Maria Carolina e Lucas no ensaio de pré-wedding",
   },
 
   /* ------------------------------------------------------------------
-     SEÇÃO: GALERIA
-     Substitua cada "arquivo" pelo caminho da foto real, mantendo a ordem.
-     Ex.: { arquivo: "assets/img/fotos/foto-01.jpg", alt: "descrição da foto" }
-     As proporções podem variar — a galeria se ajusta sozinha.
-     ------------------------------------------------------------------ */
-  galeria: {
-    titulo: "Galeria",
-    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
-    assinatura: "momentos nossos",
-    fotos: [
-      { arquivo: "assets/img/placeholders/galeria-01.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-02.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-03.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-04.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-05.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-06.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-07.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-      { arquivo: "assets/img/placeholders/galeria-08.svg", alt: "Lucas e Carol — em breve, uma foto nossa aqui" },
-    ],
-  },
-
-  /* ------------------------------------------------------------------
-     SEÇÃO: O DIA (detalhes do evento)
+     SEÇÃO 2: O GRANDE DIA (informações)
      ------------------------------------------------------------------ */
   oDia: {
-    titulo: "O dia",
-    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
-    assinatura: "o grande dia",
+    titulo: "O grande dia",
+    subtitulo: "informações",
     introducao: "O essencial para viver esse dia com a gente.",
     rotuloData: "Data",
     rotuloHorario: "Horário",
-    rotuloLocal: "Local",
+    rotuloLocal: "Espaço",
     botaoMapa: "Ver no mapa",
+    /* FOTOS DO PRÉ-WEDDING desta seção (faixa horizontal, 2 fotos).
+       Proporção 3:2 (horizontal) fica ideal. */
+    fotos: [
+      { arquivo: "assets/img/placeholders/pre-02.svg", alt: "Maria Carolina e Lucas no ensaio de pré-wedding" },
+      { arquivo: "assets/img/placeholders/pre-03.svg", alt: "Maria Carolina e Lucas no ensaio de pré-wedding" },
+    ],
   },
 
   /* ------------------------------------------------------------------
-     SEÇÃO: LISTA DE PRESENTES / PIX
+     SEÇÃO 3: PRESENTES
+     ------------------------------------------------------------------
+     COMO FUNCIONA: cada presente tem um valor e pode ter mais de uma
+     unidade. O convidado escolhe contribuir com o valor todo ou só uma
+     parte, e o site mostra a chave PIX para ele pagar.
+
+     COMO MARCAR UM PRESENTE COMO CONQUISTADO:
+     Quando alguém pagar, atualize o campo "recebido" do item com o total
+     JÁ RECEBIDO em reais. O selo "CONQUISTADO!" aparece sozinho quando
+     "recebido" alcança valor × unidades.
+     Exemplo: item de R$ 300 com 2 unidades (total R$ 600).
+     Se receber R$ 300, escreva: recebido: 300  → mostra "1 de 2 conquistadas".
+     Se receber os R$ 600, escreva: recebido: 600 → mostra "CONQUISTADO!".
+
+     Para trocar a foto de um item, coloque o arquivo em assets/img/ e
+     escreva o caminho no campo "foto".
      ------------------------------------------------------------------ */
   presentes: {
     titulo: "Presentes",
-    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
-    assinatura: "com carinho",
-    // Texto afetuoso antes do cartão do PIX.
-    texto: "O presente maior é ter você com a gente no dia 16 de janeiro. Mas, se quiser nos ajudar a regar essa vida nova, ficaremos muito felizes com qualquer carinho enviado pela chave abaixo.",
-    // Dados bancários exibidos no cartão.
+    subtitulo: "",
+    texto: "Preparamos esta lista de presentes para quem desejar nos presentear de forma prática e especial. Cada item representa um gesto de carinho que fará parte do início da nossa vida juntos. Agradecemos imensamente por todo o apoio e por celebrarem este momento ao nosso lado.",
+
+    // Dados do PIX (usados por todos os presentes).
     banco: "Nome do banco (edite aqui)",
     titular: "Nome do titular (edite aqui)",
     chavePix: "chave-pix@exemplo.com",
-    rotuloBanco: "Banco",
-    rotuloTitular: "Titular",
-    rotuloChave: "Chave PIX",
-    botaoCopiar: "Copiar chave PIX",
-    // Mensagem exibida por 2 segundos após copiar.
-    feedbackCopiado: "Chave copiada",
-    // OPCIONAL: caminho da imagem do QR Code do PIX.
-    // Deixe "" (vazio) para não exibir. Ex.: "assets/img/qr-pix.png"
+
+    // A LISTA. Copie um bloco inteiro para criar um novo presente.
+    itens: [
+      { nome: "Jogo de panelas",        valor: 890,  unidades: 1, recebido: 0, foto: "assets/img/placeholders/presente-01.svg" },
+      { nome: "Jogo de taças",          valor: 240,  unidades: 2, recebido: 0, foto: "assets/img/placeholders/presente-02.svg" },
+      { nome: "Roupa de cama",          valor: 520,  unidades: 1, recebido: 0, foto: "assets/img/placeholders/presente-03.svg" },
+      { nome: "Cafeteira",              valor: 680,  unidades: 1, recebido: 0, foto: "assets/img/placeholders/presente-04.svg" },
+      { nome: "Jogo de toalhas",        valor: 320,  unidades: 2, recebido: 0, foto: "assets/img/placeholders/presente-05.svg" },
+      { nome: "Air fryer",              valor: 750,  unidades: 1, recebido: 0, foto: "assets/img/placeholders/presente-06.svg" },
+      { nome: "Aparelho de jantar",     valor: 980,  unidades: 1, recebido: 0, foto: "assets/img/placeholders/presente-07.svg" },
+      { nome: "Nossa lua de mel",       valor: 500,  unidades: 8, recebido: 0, foto: "assets/img/placeholders/presente-08.svg" },
+    ],
+
+    // Textos da seção (editáveis).
+    rotuloConquistado: "Conquistado!",
+    rotuloUnidades: "de",            // ex.: "1 de 2 conquistadas"
+    rotuloUnidadesFim: "conquistadas",
+    rotuloDisponiveis: "unidades",   // ex.: "2 unidades" (nada recebido ainda)
+    rotuloContribuir: "Presentear",
+    rotuloValorTotal: "Valor total",
+    rotuloEscolhaValor: "Quanto você quer contribuir?",
+    rotuloValorLivre: "Outro valor",
+    rotuloCopiarPix: "Copiar chave PIX",
+    feedbackCopiado: "Chave copiada!",
+    rotuloComoPagar: "Copie a chave abaixo, faça o PIX no seu banco e pronto — o carinho já está a caminho.",
+    rotuloAvisar: "Avisar que presenteei",
+    rotuloAvisarEnviado: "Obrigado! Anotamos com carinho.",
+    // OPCIONAL: imagem do QR Code do PIX ("" para não exibir).
     qrCodeImagem: "",
-    qrCodeAlt: "QR Code da chave PIX",
   },
 
   /* ------------------------------------------------------------------
-     SEÇÃO: RSVP (confirmação de presença)
+     SEÇÃO 4: CONFIRMAÇÃO DE PRESENÇA
      ------------------------------------------------------------------ */
   rsvp: {
     titulo: "Confirme sua presença",
-    // Palavra manuscrita decorativa abaixo do título (deixe "" para ocultar).
-    assinatura: "venha celebrar",
-    introducao: "Sua presença é o que faz a festa. Conta pra gente que você vem?",
+    subtitulo: "venha celebrar!",
+    introducao: "Sua presença é o que faz a festa.",
+    rotuloNome: "Nome completo",
+    placeholderNome: "Como no convite",
+    rotuloObservacoes: "Alguma observação?",
+    placeholderObservacoes: "Restrições alimentares, recado, o que quiser nos contar…",
+    botaoEnviar: "Confirmar presença",
+    botaoEnviando: "Enviando…",
+    sucessoTitulo: "Presença confirmada!",
+    sucessoTexto: "Que alegria! Guardamos seu lugar. Até 16 de janeiro de 2027.",
+
     /* --------------------------------------------------------------
        ONDE AS RESPOSTAS CAEM — Google Sheets
        --------------------------------------------------------------
        Cole abaixo, entre as aspas, a URL do seu Apps Script implantado
        (termina em /exec). O passo a passo completo está no arquivo
        rsvp-apps-script.gs, na raiz do projeto (leva ~5 minutos).
-       Enquanto este campo estiver vazio (""), o formulário apenas
-       simula o envio e NENHUMA resposta é gravada.
+       A MESMA URL registra as confirmações de presença E os avisos de
+       presentes. Enquanto estiver vazia (""), o formulário apenas
+       simula o envio e NADA é gravado.
        -------------------------------------------------------------- */
     googleSheetsUrl: "",
-    rotuloNome: "Nome completo",
-    placeholderNome: "Como no convite",
-    rotuloAcompanhantes: "Acompanhantes",
-    notaAcompanhantes: "Sem contar você",
-    rotuloObservacoes: "Alguma observação?",
-    placeholderObservacoes: "Restrições alimentares, recado, o que quiser nos contar…",
-    botaoEnviar: "Confirmar presença",
-    botaoEnviando: "Enviando…",
-    // Mensagem exibida após o envio (título + texto).
-    sucessoTitulo: "Presença confirmada!",
-    sucessoTexto: "Que alegria! Guardamos seu lugar debaixo da laranjeira. Até o dia 16 de janeiro de 2027.",
   },
 
   /* ------------------------------------------------------------------
@@ -194,19 +205,15 @@ const SITE = {
      ------------------------------------------------------------------ */
   rodape: {
     agradecimento: "Obrigado por fazer parte da nossa história.",
-    // Micro-crédito no pé da página (bem pequeno, em CAIXA ALTA).
-    credito: "Feito com amor — 2027",
+    credito: "Com a bênção de seus pais",
   },
 
   /* ------------------------------------------------------------------
      SEO / COMPARTILHAMENTO
-     Obs.: o título e a descrição também existem no <head> do index.html
-     (necessário para buscadores e pré-visualização de links). Se alterar
-     aqui, vale atualizar lá também.
      ------------------------------------------------------------------ */
   seo: {
-    titulo: "Lucas & Carol — 16 . 01 . 2027",
-    descricao: "Vamos nos casar! 16 de janeiro de 2027, às 16h, no Espaço Querência, São José dos Pinhais — PR. Confirme sua presença.",
+    titulo: "Maria Carolina & Lucas — 16 . 01 . 2027",
+    descricao: "Vamos nos casar! 16 de janeiro de 2027, às 16 horas, no Espaço Querência, São José dos Pinhais — PR. Confirme sua presença.",
   },
 };
 

@@ -1,64 +1,86 @@
-# Site de casamento — Lucas & Carol
+# Site de casamento — Maria Carolina & Lucas
 
 Site one-page, estático (HTML + CSS + JavaScript puro), em português do Brasil.
-**16 de janeiro de 2027 · 16h · Espaço Querência, São José dos Pinhais — PR.**
+**16 de janeiro de 2027 · 16 horas · Espaço Querência, São José dos Pinhais — PR.**
 
-Tipografia: **Playfair Display** (títulos), **Great Vibes** (manuscrita) e
-**Jost** (corpo), todas self-hosted em `assets/fonts/`.
+Identidade visual derivada do convite oficial: papel claro, laranja da
+aquarela, dourado dos textos e verde-folha. Tipografia **EB Garamond**
+(no espírito do Bell MT do convite), **Pinyon Script** (caligrafia dos
+nomes) e **Jost** (rótulos pequenos) — todas self-hosted em `assets/fonts/`.
+O monograma exibido no site é o oficial, extraído do PDF em vetor.
 
 ## Como editar o conteúdo
 
-Todo o conteúdo do site (textos, nomes, datas, endereço, dados do PIX e
-caminhos de imagens) vive em **um único arquivo**: [`config.js`](config.js).
-Abra-o em qualquer editor de texto — cada campo tem um comentário explicando
-o que ele faz. Nada precisa ser alterado no HTML, no CSS ou no `main.js`.
+Todo o conteúdo (textos, datas, endereço, PIX, lista de presentes e caminhos
+de fotos) vive em **um único arquivo**: [`config.js`](config.js). Cada campo
+tem um comentário explicando o que faz. Nada precisa ser mexido no HTML, CSS
+ou `main.js`.
 
-### Trocar as fotos
+### Colocar as fotos do pré-wedding
 
-1. Coloque suas fotos em `assets/img/` (ex.: `assets/img/fotos/foto-01.jpg`).
-2. No `config.js`, troque os caminhos dos placeholders pelos das fotos reais
-   (campos `historia.imagem` e `galeria.fotos`), incluindo um `alt` descritivo.
+Os espaços já estão prontos, com imagens de exemplo. Coloque as fotos em
+`assets/img/` e troque os caminhos no `config.js`:
 
-### Trocar a paleta de cores
+| Onde aparece | Campo no `config.js` | Proporção ideal |
+|---|---|---|
+| Seção "Nosso grande dia" | `boasVindas.foto` | vertical 4:5 |
+| Seção "O grande dia" (duas fotos) | `oDia.fotos` | horizontal 3:2 |
+| Cada presente | `presentes.itens[].foto` | quadrada 1:1 |
 
-Todos os tokens de cor estão no bloco `:root` no topo de
-[`css/styles.css`](css/styles.css). Trocar a paleta inteira exige editar só
-esse bloco.
+### Lista de presentes e o selo "Conquistado!"
 
-### Onde caem as respostas do RSVP (Google Sheets)
+Cada item tem `valor`, `unidades` e `recebido` (quanto já entrou, em reais).
+O convidado escolhe pagar o valor cheio ou uma parte, e o site mostra a chave
+PIX. O selo **CONQUISTADO!** aparece sozinho quando `recebido` alcança
+`valor × unidades` — ou seja, só depois que **todas** as unidades foram
+integralmente pagas. Antes disso, o cartão mostra o progresso.
 
-As confirmações de presença são gravadas numa **planilha do Google** — uma
-linha por convidado (data/hora, nome, acompanhantes, observações). A
-configuração leva ~5 minutos e o passo a passo completo está no arquivo
-[`rsvp-apps-script.gs`](rsvp-apps-script.gs): você cria a planilha, cola o
-script no Apps Script dela, implanta como App da Web e cola a URL gerada no
-campo `rsvp.googleSheetsUrl` do `config.js`.
+Há duas formas de marcar o que já foi recebido:
 
-**Importante:** enquanto essa URL estiver vazia, o formulário apenas simula
-o envio e nenhuma resposta é gravada.
+1. **Direto no `config.js`** — edite o campo `recebido` do item e publique.
+2. **Pela planilha do Google** (mais prático) — o casal atualiza os valores
+   na planilha e o site se atualiza sozinho. Veja
+   [`rsvp-apps-script.gs`](rsvp-apps-script.gs).
+
+> O PIX não avisa o site automaticamente quando alguém paga — nenhum site
+> estático consegue isso sem um gateway de pagamento. Por isso a confirmação
+> é sempre de vocês, depois de conferir a entrada no banco. O convidado pode
+> clicar em "Avisar que presenteei", o que registra o aviso na planilha para
+> facilitar a conferência.
+
+### Confirmações de presença (RSVP)
+
+Caem numa **planilha do Google**, uma linha por convidado (data/hora, nome,
+observações). O passo a passo (~5 min) está em
+[`rsvp-apps-script.gs`](rsvp-apps-script.gs): criar a planilha, colar o
+script, implantar como App da Web e colar a URL em `rsvp.googleSheetsUrl`
+no `config.js`.
+
+**Importante:** enquanto essa URL estiver vazia, o formulário apenas simula o
+envio e nada é gravado.
 
 ## O vídeo do hero
 
-O desabrochar é **conduzido pela rolagem da página**: o miolo do hero fica
-fixo (sticky) enquanto o scroll percorre a linha do tempo do vídeo. Nunca
-chamamos `play()` — por isso não existe botão de play nem bloqueio de
-autoplay (inclusive no modo de economia de energia do iPhone). O nome
-"Lucas & Carol" fica sempre por cima, nunca é coberto.
+A ilustração em aquarela é **pintada conforme a rolagem da página**: o miolo
+do hero fica fixo (sticky) enquanto o scroll percorre a linha do tempo do
+vídeo. Nunca chamamos `play()` — por isso não existe botão de play nem
+bloqueio de autoplay (inclusive no modo de economia de energia do iPhone).
 
 Os arquivos em `assets/video/` foram gerados a partir do vídeo original com:
 
-1. Crop `1120×630` (remove a marca d'água do canto inferior direito, medida
-   em x≈1136–1185, y≈575–625, mantendo 16:9 exato);
-2. Upscale para 1920×1080 com `lanczos` + `unsharp=5:5:0.4` (por isso o
-   vídeo nunca é renderizado acima de 1200px de largura no desktop);
-3. Export H.264 `+faststart` com **keyframe em todo frame** (`-g 1`) —
-   obrigatório para o scrub por scroll ser instantâneo;
-4. Versão mobile 720×1080 (recorte vertical central) + pôsteres do primeiro
-   quadro (`hero-poster-inicio*.jpg`, capa) e do último (`hero-poster*.jpg`,
-   usado com "movimento reduzido" e como reserva).
+1. Remoção da marca d'água por **inpainting** (OpenCV, máscara fixa sobre a
+   estrela em x 1136–1183, y 576–623) — preserva a composição inteira, sem
+   corte e sem borrão;
+2. Desktop 1600×900 (composição completa) e mobile 720×900 (recorte 4:5 com
+   a flor e uma laranja);
+3. H.264 `+faststart` com **keyframe em todo frame** (`-g 1`), obrigatório
+   para o scrub por scroll ser instantâneo;
+4. Pôsteres do primeiro quadro (capa) e do último (usado com "movimento
+   reduzido" e como reserva).
 
 ## Publicação
 
-O site é 100% estático: basta hospedar a pasta inteira (GitHub Pages,
-Netlify, Vercel…). Após publicar, atualize a tag `og:image` no `index.html`
-com a URL absoluta do seu domínio.
+O site é 100% estático: basta hospedar a pasta inteira (Render, GitHub Pages,
+Netlify, Vercel…). No Render, use **Publish Directory** `.` e deixe o Build
+Command vazio. Após publicar, atualize a tag `og:image` no `index.html` com a
+URL absoluta do domínio.
