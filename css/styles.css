@@ -66,7 +66,7 @@
 
   /* --- Métricas -------------------------------------------------------- */
   --nav-height: 64px;
-  --stage-max: 1200px;
+  --stage-max: 1600px;     /* largura máxima da ilustração do hero */
   --radius-card: 10px;
   --radius-pill: 999px;
 }
@@ -218,26 +218,20 @@ body.travado { overflow: hidden; }
 
 .hero { background: var(--paper-video); }
 
-.hero--scrub {
-  height: 240vh;
-  height: 240svh;
-}
-
 .hero__pin {
-  position: sticky;
-  top: 0;
+  position: relative;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(10px, 2.2vh, 26px);
-  padding: calc(var(--nav-height) + 10px) clamp(16px, 3vw, 40px) 72px;
+  gap: clamp(8px, 1.8vh, 20px);
+  padding: calc(var(--nav-height) + 8px) clamp(12px, 2vw, 28px) 68px;
 }
 
 @media (min-width: 768px) {
-  .hero__pin { padding-bottom: 88px; }
+  .hero__pin { padding-bottom: 76px; }
 }
 
 .hero__inner {
@@ -258,12 +252,12 @@ body.travado { overflow: hidden; }
   color: var(--gold-deep);
 }
 
-/* A largura do palco é limitada pela altura livre da tela, para que
-   legenda, nome e data caibam sempre na mesma dobra. */
+/* A ilustração ocupa boa parte da largura, limitada pela altura livre
+   da tela para que legenda, nome e data caibam na mesma dobra. */
 .hero__stage {
   position: relative;
-  width: min(100%, calc((100vh - 330px) * .857));
-  width: min(100%, calc((100svh - 330px) * .857));
+  width: min(100%, calc((100vh - 290px) * .857));
+  width: min(100%, calc((100svh - 290px) * .857));
   opacity: 0;
   transition: opacity 1.2s ease;
 }
@@ -272,8 +266,8 @@ body.travado { overflow: hidden; }
 
 @media (min-width: 768px) {
   .hero__stage {
-    width: min(100%, var(--stage-max), calc((100vh - 400px) * 1.7778));
-    width: min(100%, var(--stage-max), calc((100svh - 400px) * 1.7778));
+    width: min(96vw, var(--stage-max), calc((100vh - 300px) * 2));
+    width: min(96vw, var(--stage-max), calc((100svh - 300px) * 2));
   }
 }
 
@@ -292,17 +286,36 @@ body.travado { overflow: hidden; }
   }
 }
 
-.hero__video-wrap video,
-.hero__video-wrap img {
+/* A capa (imagem) e o vídeo ocupam exatamente o mesmo espaço: o vídeo
+   entra por cima só quando começa a tocar, e no fim a capa reassume
+   já com a ilustração completa. */
+.hero__video-wrap img,
+.hero__video-wrap video {
   width: 100%;
   height: auto;
   aspect-ratio: 6 / 7;
   object-fit: cover;
 }
 
+.hero__video-wrap video {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+
+.hero__stage.is-tocando .hero__video-wrap video { opacity: 1; }
+
+/* Ao terminar, a imagem final entra e o vídeo sai de cena. */
+.hero__stage.is-final .hero__video-wrap video { opacity: 0; }
+
+/* No desktop a ilustração é exibida em recorte panorâmico, o que a deixa
+   ocupar boa parte da largura da página sem empurrar nome e data para
+   fora da primeira dobra. */
 @media (min-width: 768px) {
-  .hero__video-wrap video,
-  .hero__video-wrap img { aspect-ratio: 16 / 9; }
+  .hero__video-wrap img,
+  .hero__video-wrap video { aspect-ratio: 2 / 1; }
 }
 
 /* O nome, em caligrafia, abaixo da ilustração — sempre legível.

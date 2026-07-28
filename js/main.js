@@ -125,48 +125,54 @@
   }
 
   /* ------------------------------------------------------------------
-     HERO: a aquarela é pintada conforme a ROLAGEM da página.
-     Nunca chamamos play() — por isso não existe botão de play nem
-     bloqueio de autoplay (inclusive no modo de economia do iPhone).
+     HERO: o vídeo toca UMA vez, sozinho, e congela na ilustração
+     completa. Nunca entra em laço nem reinicia.
+
+     Para o iPhone nunca exibir o botão de play nativo (o que acontece
+     quando o autoplay é barrado, por exemplo no modo de economia de
+     energia), o vídeo fica invisível até começar de fato a tocar: por
+     baixo dele há sempre uma imagem. Se o autoplay for barrado, tentamos
+     de novo no primeiro toque e, persistindo, mostramos a ilustração
+     pronta — o convidado nunca vê um controle solto na tela.
      ------------------------------------------------------------------ */
   function montarHero() {
-    var hero = $("inicio");
     var stage = $("hero-stage");
     var wrap = $("hero-video-wrap");
     var cfg = SITE.heroVideo;
     var posterInicio = ehMobile ? cfg.posterInicioMobile : cfg.posterInicioDesktop;
     var posterFinal = ehMobile ? cfg.posterMobile : cfg.posterDesktop;
 
-    function somenteImagem(src) {
-      wrap.textContent = "";
-      var img = document.createElement("img");
-      img.src = src;
-      img.alt = cfg.descricao;
-      wrap.appendChild(img);
-      stage.classList.add("is-ready");
-    }
+    // Camada de imagem, sempre presente por baixo do vídeo.
+    var capa = document.createElement("img");
+    capa.className = "hero__capa";
+    capa.src = reduzMovimento ? posterFinal : posterInicio;
+    capa.alt = cfg.descricao;
+    wrap.appendChild(capa);
+    stage.classList.add("is-ready");
 
-    if (reduzMovimento) {
-      somenteImagem(posterFinal);
-      return;
-    }
+    // Movimento reduzido: só a ilustração pronta, sem vídeo.
+    if (reduzMovimento) return;
 
-    hero.classList.add("hero--scrub");
+    // Pré-carrega o quadro final para a troca no fim ser instantânea.
+    var fim = new Image();
+    fim.src = posterFinal;
 
     var video = document.createElement("video");
     video.muted = true;
     video.setAttribute("muted", "");
+    video.defaultMuted = true;
+    video.autoplay = true;
+    video.setAttribute("autoplay", "");
     video.playsInline = true;
     video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
     video.preload = "auto";
-    video.poster = posterInicio;
     video.disablePictureInPicture = true;
-    video.setAttribute("aria-label", cfg.descricao);
-    video.width = ehMobile ? 720 : 1600;
-    video.height = 900;
+    video.setAttribute("aria-hidden", "true");
+    video.width = ehMobile ? 864 : 1920;
+    video.height = 1080;
+    // SEM loop: o desabrochar acontece uma única vez.
 
-    // MP4 primeiro (universal em Safari, Chrome, Edge e Firefox); o WebM
-    // atende navegadores sem suporte a H.264.
     var srcMp4 = document.createElement("source");
     srcMp4.src = ehMobile ? cfg.mobileMp4 : cfg.desktopMp4;
     srcMp4.type = "video/mp4";
@@ -178,75 +184,62 @@
       video.appendChild(srcWebm);
     }
     wrap.appendChild(video);
-    try { video.load(); } catch (e) { /* indiferente */ }
 
-    // A visibilidade NUNCA depende do carregamento do vídeo.
-    requestAnimationFrame(function () { stage.classList.add("is-ready"); });
+    // Só revela o vídeo quando ele realmente começa a rodar.
+    video.addEventListener("playing", function () {
+      stage.classList.add("is-tocando");
+    }, { once: true });
 
-    // Um "erro" no vídeo nem sempre é fatal: navegadores abortam e refazem
-    // o download de arquivos grandes. Só desistimos quando o elemento
-    // reporta um erro de mídia real — e ainda assim tentamos de novo antes.
+    // No fim, congela: a ilustração completa assume e o vídeo se recolhe.
+    video.addEventListener("ended", function () {
+      capa.src = posterFinal;
+      stage.classList.add("is-final");
+      setTimeout(function () {
+        if (video.parentNode) video.parentNode.removeChild(video);
+      }, 900);
+    }, { once: true });
+
+    var desistiu = false;
+    function mostrarPronta() {
+      if (desistiu) return;
+      desistiu = true;
+      capa.src = posterFinal;
+      stage.classList.add("is-final");
+      if (video.parentNode) video.parentNode.removeChild(video);
+    }
+
     var tentativas = 0;
+    function tentarTocar() {
+      if (desistiu || !video.parentNode) return;
+      var p = video.play();
+      if (p && p.catch) {
+        p.catch(function () {
+          tentativas++;
+          // Autoplay barrado: tenta de novo no primeiro gesto do convidado.
+          if (tentativas === 1) {
+            ["touchstart", "pointerdown", "scroll", "keydown"].forEach(function (ev) {
+              window.addEventListener(ev, tentarTocar, { once: true, passive: true });
+            });
+          }
+        });
+      }
+    }
+
+    video.addEventListener("loadeddata", tentarTocar);
+    video.addEventListener("canplay", tentarTocar);
+    tentarTocar();
+
     video.addEventListener("error", function () {
-      if (!video.error && tentativas < 2) {
-        tentativas++;
-        try { video.load(); } catch (e) { /* indiferente */ }
-        return;
-      }
-      hero.classList.remove("hero--scrub");
-      somenteImagem(posterFinal);
+      // Abortos transitórios acontecem com arquivos grandes; só desiste
+      // quando o elemento reporta erro real de mídia.
+      if (!video.error) return;
+      mostrarPronta();
     });
 
-    function destravar() {
-      if (video.readyState === 0) { try { video.load(); } catch (e) { /* indiferente */ } }
-    }
-    window.addEventListener("touchstart", destravar, { once: true, passive: true });
-    window.addEventListener("pointerdown", destravar, { once: true, passive: true });
-
-    // Vigia: sem nenhum dado após 8s, mostra a ilustração pronta.
+    // Se em 10s o vídeo não tiver começado, mostra a ilustração pronta.
     setTimeout(function () {
-      if (video.readyState === 0 && document.body.contains(video)) {
-        hero.classList.remove("hero--scrub");
-        somenteImagem(posterFinal);
-      }
-    }, 8000);
-
-    var duracao = 0, atual = null, agendado = false;
-
-    function progresso() {
-      var total = hero.offsetHeight - window.innerHeight;
-      if (total <= 0) return 1;
-      return Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
-    }
-
-    function quadro() {
-      agendado = false;
-      if (!duracao) return;
-      var alvo = progresso() * (duracao - 0.06);
-      if (atual === null) atual = video.currentTime || 0;
-      var delta = alvo - atual;
-      if (Math.abs(delta) >= 0.004) {
-        atual = Math.abs(delta) < 0.03 ? alvo : atual + delta * 0.22;
-      }
-      var exibido = video.currentTime || 0;
-      if (Math.abs(exibido - atual) > 0.02) {
-        try { video.currentTime = Math.max(0, atual); } catch (e) { /* carregando */ }
-      }
-      if (Math.abs(alvo - atual) >= 0.004 || Math.abs(exibido - atual) > 0.08) agendar();
-    }
-
-    function agendar() {
-      if (!agendado) { agendado = true; requestAnimationFrame(quadro); }
-    }
-
-    video.addEventListener("loadedmetadata", function () {
-      duracao = video.duration;
-      agendar();
-    });
-    video.addEventListener("progress", agendar);
-    video.addEventListener("canplay", agendar);
-    window.addEventListener("scroll", agendar, { passive: true });
-    window.addEventListener("resize", agendar, { passive: true });
+      if (!stage.classList.contains("is-tocando")) mostrarPronta();
+    }, 10000);
   }
 
   /* ------------------------------------------------------------------
@@ -256,11 +249,8 @@
     var nav = $("nav");
     var burger = $("nav-burger");
     var menu = $("menu-mobile");
-    var hero = $("inicio");
-
     function aoRolar() {
-      var limite = Math.max(24, hero.offsetHeight - window.innerHeight - 40);
-      nav.classList.toggle("is-scrolled", window.scrollY > limite);
+      nav.classList.toggle("is-scrolled", window.scrollY > 24);
     }
     window.addEventListener("scroll", aoRolar, { passive: true });
     aoRolar();

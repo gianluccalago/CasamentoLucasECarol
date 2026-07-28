@@ -61,22 +61,29 @@ envio e nada é gravado.
 
 ## O vídeo do hero
 
-A ilustração em aquarela é **pintada conforme a rolagem da página**: o miolo
-do hero fica fixo (sticky) enquanto o scroll percorre a linha do tempo do
-vídeo. Nunca chamamos `play()` — por isso não existe botão de play nem
-bloqueio de autoplay (inclusive no modo de economia de energia do iPhone).
+A ilustração em aquarela **toca sozinha uma única vez** ao abrir a página e
+**congela na ilustração completa** — nunca reinicia nem entra em laço.
+
+Para o iPhone jamais exibir o botão de play nativo (que aparece quando o
+autoplay é barrado, por exemplo no modo de economia de energia), o vídeo fica
+invisível até começar de fato a tocar: por baixo dele há sempre uma imagem.
+Se o autoplay for barrado, o site tenta de novo no primeiro toque e,
+persistindo, mostra a ilustração pronta.
 
 Os arquivos em `assets/video/` foram gerados a partir do vídeo original com:
 
 1. Remoção da marca d'água por **inpainting** (OpenCV, máscara fixa sobre a
    estrela em x 1136–1183, y 576–623) — preserva a composição inteira, sem
    corte e sem borrão;
-2. Desktop 1600×900 (composição completa) e mobile 720×900 (recorte 4:5 com
-   a flor e uma laranja);
-3. H.264 `+faststart` com **keyframe em todo frame** (`-g 1`), obrigatório
-   para o scrub por scroll ser instantâneo;
-4. Pôsteres do primeiro quadro (capa) e do último (usado com "movimento
-   reduzido" e como reserva).
+2. Desktop 1920×1080 e mobile 864×1080 (recorte 4:5 com a flor e uma
+   laranja), upscale `lanczos` + `unsharp`;
+3. H.264 CRF 18 (qualidade alta), perfil high, `+faststart`, e WebM VP9 como
+   alternativa para navegadores sem H.264;
+4. Pôsteres do primeiro quadro (capa) e do último (exibido no congelamento,
+   com "movimento reduzido" e como reserva).
+
+No desktop a ilustração é exibida em recorte panorâmico (2:1), ocupando
+~83% da largura da página; no celular, ~94%.
 
 ## Publicação
 
