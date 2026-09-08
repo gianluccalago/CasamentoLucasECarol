@@ -568,7 +568,6 @@
     $("confirmar-titulo").textContent = p.confirmarTitulo;
     $("confirmar-nota").textContent = p.confirmarNota;
     $("confirmar-rot-nome").textContent = p.confirmarRotuloNome;
-    $("confirmar-enviar").textContent = p.confirmarBotao;
     $("confirmar-enviar").disabled = false;
     $("confirmar-erro").hidden = true;
     $("confirmar-formulario").hidden = false;
@@ -610,10 +609,14 @@
     $("modal-fechar").focus();
   }
 
-  /* Refaz o código PIX e o QR sempre que o valor escolhido muda. */
+  /* Refaz o código PIX, o QR e o botão de confirmação sempre que o valor
+     escolhido muda — assim fica claro que o registro é do valor escolhido,
+     seja o total, a metade ou outro. */
   function atualizarPix() {
     if (!itemAtual) return;
     var p = SITE.presentes;
+    // Deixa o valor à vista no botão: "Já fiz o PIX de R$ 120"
+    $("confirmar-enviar").textContent = p.confirmarBotao + " de " + moeda(valorEscolhido);
     var codigo = window.PIX.montar({
       chave: p.chavePix,
       nome: p.titular,
@@ -704,7 +707,7 @@
         })
         .catch(function () {
           botao.disabled = false;
-          botao.textContent = p.confirmarBotao;
+          botao.textContent = p.confirmarBotao + " de " + moeda(valor);
           erro(p.confirmarErroEnvio);
         });
     });

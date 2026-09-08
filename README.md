@@ -48,9 +48,15 @@ a maioria dos bancos já permite (o site menciona isso).
 > para a conta errada. Faça um teste de R$ 1,00 antes de divulgar o site.
 
 **Para não darem o mesmo presente duas vezes:** depois de pagar, o convidado
-escreve o nome e clica em "Já fiz o PIX deste presente". O item passa a
-aparecer como **CONQUISTADO** e some da lista. Itens com mais de uma unidade
-só bloqueiam quando todas forem pagas.
+escreve o nome e clica no botão de confirmação, que mostra o valor escolhido
+(ex.: "Já fiz o PIX de R$ 120"). O item passa a aparecer como **CONQUISTADO**
+e some da lista. Contribuições parciais são somadas: quem deu metade fica
+registrado com a sua parte, o cartão mostra o progresso e outra pessoa pode
+completar depois. Itens com mais de uma unidade só bloqueiam quando o total
+for alcançado.
+
+O site foi tipografado com corpo maior que o usual (21–22 px, rótulos a
+partir de 13 px) porque parte dos convidados é idosa.
 
 Para esse bloqueio valer para **todos os convidados**, é preciso configurar
 o Supabase (10 minutos, sem pagamento nem token envolvido) — veja

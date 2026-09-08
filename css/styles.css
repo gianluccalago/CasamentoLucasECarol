@@ -87,14 +87,14 @@ body {
   margin: 0;
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: 19px;
-  line-height: 1.62;
+  font-size: 21px;
+  line-height: 1.65;
   color: var(--ink);
   background: var(--paper);
   -webkit-font-smoothing: antialiased;
 }
 
-@media (min-width: 1100px) { body { font-size: 20px; } }
+@media (min-width: 1100px) { body { font-size: 22px; } }
 
 img, svg, video { display: block; }
 a { color: inherit; }
@@ -145,7 +145,7 @@ body.travado { overflow: hidden; }
 
 .nav__links a {
   font-family: var(--font-micro);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: .16em;
   text-transform: uppercase;
@@ -203,7 +203,7 @@ body.travado { overflow: hidden; }
 .menu__links a {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(26px, 6.5vw, 34px);
+  font-size: clamp(29px, 7vw, 36px);
   letter-spacing: .1em;
   text-transform: uppercase;
   text-decoration: none;
@@ -245,9 +245,9 @@ body.travado { overflow: hidden; }
 .hero__eyebrow {
   margin: 0;
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: .34em;
+  letter-spacing: .28em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
@@ -357,9 +357,9 @@ body.travado { overflow: hidden; }
   align-items: center;
   gap: 14px;
   font-family: var(--font-micro);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: .32em;
+  letter-spacing: .26em;
   color: var(--gold-deep);
 }
 
@@ -458,13 +458,13 @@ body.travado { overflow: hidden; }
   display: inline-block;
   border-radius: var(--radius-pill);
   font-family: var(--font-micro);
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
-  letter-spacing: .14em;
+  letter-spacing: .1em;
   text-transform: uppercase;
   text-decoration: none;
   text-align: center;
-  padding: 14px 32px;
+  padding: 16px 32px;
   cursor: pointer;
   border: 1px solid transparent;
   transition: background-color .25s ease, color .25s ease, border-color .25s ease;
@@ -562,9 +562,9 @@ body.travado { overflow: hidden; }
 .odia__rotulo {
   margin: 0;
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: .18em;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
@@ -579,7 +579,7 @@ body.travado { overflow: hidden; }
 
 .odia__nota {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   color: var(--ink-soft);
   max-width: 38ch;
   white-space: pre-line;
@@ -648,14 +648,14 @@ body.travado { overflow: hidden; }
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 21px;
+  font-size: 24px;
   line-height: 1.2;
 }
 
 .presente__valor {
   margin: 0;
   font-family: var(--font-micro);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   letter-spacing: .04em;
   color: var(--orange-ink);
@@ -664,8 +664,8 @@ body.travado { overflow: hidden; }
 .presente__unidades {
   margin: 0;
   font-family: var(--font-micro);
-  font-size: 11px;
-  letter-spacing: .12em;
+  font-size: 13px;
+  letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -686,7 +686,18 @@ body.travado { overflow: hidden; }
 }
 
 .presente__acao { margin-top: auto; padding-top: 12px; }
-.presente__acao .botao { width: 100%; padding-inline: 14px; }
+
+/* O botão vive dentro de uma coluna estreita: aperta o espaçamento das
+   letras para caber sem encolher a fonte, que precisa continuar legível. */
+.presente__acao .botao {
+  width: 100%;
+  padding-inline: 8px;
+  letter-spacing: .04em;
+}
+
+@media (min-width: 420px) {
+  .presente__acao .botao { padding-inline: 14px; letter-spacing: .08em; }
+}
 
 /* Estado conquistado */
 .presente.is-conquistado .presente__foto { opacity: .48; }
@@ -704,9 +715,9 @@ body.travado { overflow: hidden; }
   background: var(--leaf-deep);
   color: #fff;
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: .16em;
+  letter-spacing: .14em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -767,15 +778,15 @@ body.travado { overflow: hidden; }
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 27px;
+  font-size: 30px;
   line-height: 1.2;
 }
 
 .modal__valor {
   margin: 0;
   font-family: var(--font-micro);
-  font-size: 13px;
-  letter-spacing: .1em;
+  font-size: 16px;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -783,9 +794,9 @@ body.travado { overflow: hidden; }
 .modal__rotulo {
   margin: 10px 0 0;
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: .16em;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
@@ -801,9 +812,9 @@ body.travado { overflow: hidden; }
   background: transparent;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-pill);
-  padding: 11px 6px;
+  padding: 15px 6px;
   font-family: var(--font-micro);
-  font-size: 13px;
+  font-size: 18px;
   color: var(--ink);
   cursor: pointer;
   transition: border-color .2s ease, background-color .2s ease, color .2s ease;
@@ -822,7 +833,7 @@ body.travado { overflow: hidden; }
 
 .modal__como {
   margin: 6px 0 0;
-  font-size: 16px;
+  font-size: 18px;
   color: var(--ink-soft);
 }
 
@@ -838,16 +849,16 @@ body.travado { overflow: hidden; }
 
 .modal__pix dt {
   font-family: var(--font-micro);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: .16em;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--gold-deep);
   margin-bottom: 2px;
 }
 
-.modal__pix dd { margin: 0; font-size: 18px; }
-.modal__chave { font-family: var(--font-micro); font-size: 15px; word-break: break-all; }
+.modal__pix dd { margin: 0; font-size: 20px; }
+.modal__chave { font-family: var(--font-micro); font-size: 17px; word-break: break-all; }
 
 .modal__qr { margin: 0; }
 .modal__qr img { width: min(190px, 66%); margin-inline: auto; border-radius: var(--radius-card); }
@@ -862,12 +873,12 @@ body.travado { overflow: hidden; }
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 21px;
+  font-size: 24px;
 }
 
 .pagar__nota {
   margin: 0;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.5;
   color: var(--ink-soft);
 }
@@ -888,9 +899,9 @@ body.travado { overflow: hidden; }
 .pagar__rotulo {
   margin: 4px 0 0;
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: .14em;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
@@ -905,8 +916,8 @@ body.travado { overflow: hidden; }
   border: 1px dashed var(--orange);
   border-radius: var(--radius-card);
   font-family: var(--font-micro);
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
   word-break: break-all;
   text-align: left;
   color: var(--ink-soft);
@@ -921,15 +932,15 @@ body.travado { overflow: hidden; }
 
 .pagar__dados dt {
   font-family: var(--font-micro);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: .16em;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
 
-.pagar__dados dd { margin: 0; font-size: 16px; }
-.pagar__chave { font-family: var(--font-micro); font-size: 14px; word-break: break-all; }
+.pagar__dados dd { margin: 0; font-size: 19px; }
+.pagar__chave { font-family: var(--font-micro); font-size: 17px; word-break: break-all; }
 
 /* Separador "ou" entre as duas formas de pagamento */
 .pagar__ou {
@@ -938,8 +949,8 @@ body.travado { overflow: hidden; }
   gap: 14px;
   margin-top: 8px;
   font-family: var(--font-micro);
-  font-size: 11px;
-  letter-spacing: .18em;
+  font-size: 13px;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -969,7 +980,7 @@ body.travado { overflow: hidden; }
 /* Lembrete de que dá para parcelar o PIX no próprio banco */
 .pagar__parcelar {
   margin: 2px 0 0;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.5;
   color: var(--ink-soft);
   font-style: italic;
@@ -977,14 +988,14 @@ body.travado { overflow: hidden; }
 
 .modal__erro {
   margin: 0;
-  font-size: 15px;
+  font-size: 17px;
   color: #A02D0F;
   text-align: left;
 }
 
 .modal__aviso {
   margin: 0;
-  font-size: 15px;
+  font-size: 18px;
   color: var(--ink-soft);
 }
 
@@ -1003,9 +1014,9 @@ body.travado { overflow: hidden; }
 
 .campo__rotulo {
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: .16em;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--gold-deep);
 }
@@ -1016,9 +1027,9 @@ body.travado { overflow: hidden; }
   border: 0;
   border-bottom: 1px solid var(--gold);
   border-radius: 0;
-  padding: 10px 2px;
+  padding: 12px 2px;
   font-family: var(--font-body);
-  font-size: 19px;
+  font-size: 22px;
   color: var(--ink);
   transition: border-color .25s ease;
 }
@@ -1041,7 +1052,7 @@ body.travado { overflow: hidden; }
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 30px;
+  font-size: 33px;
   letter-spacing: .04em;
 }
 
@@ -1080,8 +1091,8 @@ body.travado { overflow: hidden; }
 .rodape__versiculo-ref {
   margin: 0;
   font-family: var(--font-micro);
-  font-size: 11px;
-  letter-spacing: .16em;
+  font-size: 13px;
+  letter-spacing: .14em;
   text-transform: uppercase;
   opacity: .78;
 }
@@ -1091,17 +1102,17 @@ body.travado { overflow: hidden; }
 .rodape__data {
   margin: 12px 0 0;
   font-family: var(--font-micro);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: .3em;
+  letter-spacing: .24em;
   text-transform: uppercase;
 }
 
 .rodape__credito {
   margin: 42px 0 0;
   font-family: var(--font-micro);
-  font-size: 10px;
-  letter-spacing: .16em;
+  font-size: 12px;
+  letter-spacing: .14em;
   text-transform: uppercase;
   opacity: .72;
 }

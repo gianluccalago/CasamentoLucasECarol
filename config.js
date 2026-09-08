@@ -217,9 +217,11 @@ const SITE = {
        ---------------------------------------------------------------- */
     confirmarOu: "depois de pagar",
     confirmarTitulo: "Avise que este presente é seu",
-    confirmarNota: "Assim ele sai da lista e ninguém repete o mesmo presente. Leva um segundo.",
+    confirmarNota: "Assim ele sai da lista e ninguém repete o mesmo presente. Se você contribuiu com parte do valor, registramos a sua parte — outra pessoa pode completar depois.",
     confirmarRotuloNome: "Seu nome",
-    confirmarBotao: "Já fiz o PIX deste presente",
+    // O valor escolhido é acrescentado ao final do botão automaticamente.
+    // Ex.: "Já fiz o PIX de R$ 120"
+    confirmarBotao: "Já fiz o PIX",
     confirmarBotaoEnviando: "Registrando…",
     confirmarObrigado: "Presente reservado. Obrigado de coração!",
     confirmarErroNome: "Escreva seu nome para registrarmos o presente.",
