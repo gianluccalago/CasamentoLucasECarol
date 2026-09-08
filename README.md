@@ -117,3 +117,14 @@ O site é 100% estático: basta hospedar a pasta inteira (Render, GitHub Pages,
 Netlify, Vercel…). No Render, use **Publish Directory** `.` e deixe o Build
 Command vazio. Após publicar, atualize a tag `og:image` no `index.html` com a
 URL absoluta do domínio.
+
+### Para alterar algo, você não precisa instalar nada
+
+Não é necessário ter git, editor ou qualquer programa no computador. Há dois
+caminhos:
+
+- **Peça aqui no chat** — as alterações são feitas, versionadas e publicadas
+  para você.
+- **Edite pelo navegador** — abra o arquivo (normalmente o `config.js`) no
+  site do GitHub, clique no ícone de lápis, altere e confirme em
+  *Commit changes*. O Render republica sozinho em cerca de um minuto.

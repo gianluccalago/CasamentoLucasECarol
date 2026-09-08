@@ -69,7 +69,10 @@ supabase: {
 },
 ```
 
-3. Publique (commit + push; o Render atualiza sozinho).
+3. Publique. Você **não precisa de git nem de nada instalado** para isso —
+   basta pedir a alteração aqui no chat, ou editar o `config.js` direto no
+   site do GitHub (abra o arquivo → ícone de lápis → *Commit changes*). O
+   Render publica sozinho em cerca de um minuto.
 
 Pronto. A lista de presentes passa a vir do banco e, quando alguém confirma
 que presenteou, o item aparece como **CONQUISTADO** para todos.
