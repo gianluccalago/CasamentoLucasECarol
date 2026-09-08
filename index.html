@@ -314,16 +314,40 @@
         <input class="campo__input" id="modal-livre" type="text" inputmode="decimal" autocomplete="off">
       </div>
 
-      <p class="modal__como" id="modal-como"></p>
-      <dl class="modal__pix">
-        <div><dt>Banco</dt><dd id="modal-banco"></dd></div>
-        <div><dt>Titular</dt><dd id="modal-titular"></dd></div>
-        <div><dt>Chave PIX</dt><dd class="modal__chave" id="modal-chave"></dd></div>
-      </dl>
-      <figure class="modal__qr" id="modal-qr" hidden><img id="modal-qr-img" alt="QR Code do PIX" loading="lazy"></figure>
+      <!-- Modo simples: chave PIX fixa do casal (sem Supabase configurado) -->
+      <div id="modal-modo-chave">
+        <p class="modal__como" id="modal-como"></p>
+        <dl class="modal__pix">
+          <div><dt>Banco</dt><dd id="modal-banco"></dd></div>
+          <div><dt>Titular</dt><dd id="modal-titular"></dd></div>
+          <div><dt>Chave PIX</dt><dd class="modal__chave" id="modal-chave"></dd></div>
+        </dl>
+        <figure class="modal__qr" id="modal-qr" hidden><img id="modal-qr-img" alt="QR Code do PIX" loading="lazy"></figure>
+        <button class="botao botao--primario" id="modal-copiar" type="button"></button>
+        <button class="botao botao--texto" id="modal-avisar" type="button"></button>
+      </div>
 
-      <button class="botao botao--primario" id="modal-copiar" type="button"></button>
-      <button class="botao botao--texto" id="modal-avisar" type="button"></button>
+      <!-- Modo automático: gera um PIX pelo Mercado Pago (Supabase ligado) -->
+      <div id="modal-modo-mp" hidden>
+        <div class="campo">
+          <label class="campo__rotulo" for="mp-nome">Seu nome</label>
+          <input class="campo__input" id="mp-nome" type="text" autocomplete="name">
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="mp-email">Seu e-mail</label>
+          <input class="campo__input" id="mp-email" type="email" autocomplete="email"
+                 placeholder="para o comprovante">
+        </div>
+        <p class="modal__erro" id="mp-erro" hidden></p>
+        <button class="botao botao--primario" id="mp-gerar" type="button">Gerar PIX</button>
+
+        <div id="mp-resultado" hidden>
+          <p class="modal__como">Aponte a câmera do seu banco para o código, ou copie o texto abaixo.</p>
+          <figure class="modal__qr"><img id="mp-qr-img" alt="QR Code do PIX"></figure>
+          <button class="botao botao--primario" id="mp-copiar" type="button">Copiar código PIX</button>
+          <p class="modal__aviso" id="mp-status">Assim que o pagamento cair, o presente aparece como conquistado.</p>
+        </div>
+      </div>
     </div>
   </div>
 

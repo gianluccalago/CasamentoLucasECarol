@@ -49,11 +49,19 @@ Há duas formas de marcar o que já foi recebido:
    na planilha e o site se atualiza sozinho. Veja
    [`rsvp-apps-script.gs`](rsvp-apps-script.gs).
 
-> O PIX não avisa o site automaticamente quando alguém paga — nenhum site
-> estático consegue isso sem um gateway de pagamento. Por isso a confirmação
-> é sempre de vocês, depois de conferir a entrada no banco. O convidado pode
-> clicar em "Avisar que presenteei", o que registra o aviso na planilha para
-> facilitar a conferência.
+> O PIX não avisa o site automaticamente quando alguém paga. Por isso, neste
+> modo, a confirmação é sempre de vocês, depois de conferir a entrada no
+> banco. O convidado pode clicar em "Avisar que presenteei", o que registra
+> o aviso na planilha para facilitar a conferência.
+
+### Opção 3 — PIX automático (Supabase + Mercado Pago)
+
+Existe um terceiro caminho, em que o pagamento do PIX marca o presente como
+conquistado **sozinho**, sem vocês conferirem nada: o site gera a cobrança
+pelo Mercado Pago e recebe a confirmação por webhook. O passo a passo
+completo está em **[SUPABASE.md](SUPABASE.md)** — inclui o SQL das tabelas,
+as duas funções de servidor e a comparação de custos (o Mercado Pago cobra
+taxa por PIX recebido; o PIX direto não).
 
 ### Confirmações de presença (RSVP)
 

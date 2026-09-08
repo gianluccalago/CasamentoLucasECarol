@@ -16,6 +16,26 @@
 const SITE = {
 
   /* ------------------------------------------------------------------
+     SUPABASE (opcional) — presentes com PIX automático
+     ------------------------------------------------------------------
+     Preencha estes dois campos para ligar o site ao Supabase: a lista de
+     presentes passa a vir do banco e o pagamento do PIX marca o item
+     como conquistado sozinho, via Mercado Pago.
+
+     O passo a passo completo está no arquivo SUPABASE.md.
+
+     Enquanto estiverem vazios (""), o site funciona normalmente com a
+     lista de presentes escrita mais abaixo, neste mesmo arquivo.
+
+     A chave "anonKey" é pública por natureza e pode ficar aqui.
+     NUNCA coloque aqui a chave "service_role".
+     ------------------------------------------------------------------ */
+  supabase: {
+    url: "",
+    anonKey: "",
+  },
+
+  /* ------------------------------------------------------------------
      OS NOIVOS E O EVENTO
      ------------------------------------------------------------------ */
   casal: {

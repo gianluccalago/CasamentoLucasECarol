@@ -21,6 +21,58 @@
   }
 
   /* ------------------------------------------------------------------
+     SUPABASE (opcional)
+     ------------------------------------------------------------------
+     Se as chaves estiverem preenchidas no config.js, a lista de presentes
+     vem do banco e o PIX é gerado pelo Mercado Pago, com confirmação
+     automática. Se não estiverem, tudo segue funcionando com a lista
+     escrita no config.js. Passo a passo: SUPABASE.md
+     ------------------------------------------------------------------ */
+  var SB = (SITE.supabase && SITE.supabase.url && SITE.supabase.anonKey)
+    ? { url: SITE.supabase.url.replace(/\/+$/, ""), chave: SITE.supabase.anonKey }
+    : null;
+
+  function sbFetch(caminho, opcoes) {
+    opcoes = opcoes || {};
+    return fetch(SB.url + caminho, {
+      method: opcoes.metodo || "GET",
+      headers: {
+        "apikey": SB.chave,
+        "Authorization": "Bearer " + SB.chave,
+        "Content-Type": "application/json",
+        "Prefer": opcoes.prefer || "",
+      },
+      body: opcoes.corpo ? JSON.stringify(opcoes.corpo) : undefined,
+    });
+  }
+
+  /* Traz os presentes do banco para dentro de SITE.presentes.itens, no
+     mesmo formato que o resto do site já usa. */
+  function carregarPresentesDoBanco() {
+    if (!SB) return Promise.resolve(false);
+    return sbFetch("/rest/v1/presentes?select=id,nome,valor,unidades,foto,recebido&ativo=eq.true&order=ordem")
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)); })
+      .then(function (linhas) {
+        if (!Array.isArray(linhas) || !linhas.length) return false;
+        SITE.presentes.itens = linhas.map(function (l) {
+          return {
+            id: l.id,
+            nome: l.nome,
+            valor: Number(l.valor),
+            unidades: Number(l.unidades) || 1,
+            recebido: Number(l.recebido) || 0,
+            foto: l.foto || "assets/img/placeholders/presente-01.svg",
+          };
+        });
+        return true;
+      })
+      .catch(function (erro) {
+        console.warn("Não consegui ler os presentes do Supabase; usando a lista do config.js.", erro);
+        return false;
+      });
+  }
+
+  /* ------------------------------------------------------------------
      HIDRATAÇÃO: despeja o conteúdo do config.js no HTML
      ------------------------------------------------------------------ */
   function hidratar() {
@@ -497,6 +549,20 @@
       $("modal-qr").hidden = true;
     }
 
+    // Com o Supabase ligado, o PIX é gerado na hora pelo Mercado Pago.
+    $("modal-modo-chave").hidden = !!SB;
+    $("modal-modo-mp").hidden = !SB;
+    if (SB) {
+      $("mp-resultado").hidden = true;
+      $("mp-erro").hidden = true;
+      $("mp-gerar").disabled = false;
+      $("mp-gerar").textContent = "Gerar PIX";
+      $("mp-status").classList.remove("is-pago");
+      $("mp-status").textContent =
+        "Assim que o pagamento cair, o presente aparece como conquistado.";
+      pararDeAcompanhar();
+    }
+
     // Sugestões: metade, o que falta e o valor cheio de uma unidade
     var falta = Math.max(0, e.alvo - e.recebido);
     var opcoes = [
@@ -534,6 +600,119 @@
     $("modal-presente").hidden = true;
     document.body.classList.remove("travado");
     itemAtual = null;
+    pararDeAcompanhar();
+  }
+
+  /* ------------------------------------------------------------------
+     PIX pelo Mercado Pago (só quando o Supabase está configurado)
+     ------------------------------------------------------------------ */
+  var acompanhando = null;
+
+  function pararDeAcompanhar() {
+    if (acompanhando) { clearInterval(acompanhando); acompanhando = null; }
+  }
+
+  /* Depois de gerar o PIX, verifica de tempos em tempos se o presente já
+     foi creditado. Quem confirma o pagamento é o Mercado Pago, avisando o
+     nosso servidor; aqui só observamos o total subir. */
+  function acompanharPagamento(presenteId, recebidoAntes) {
+    pararDeAcompanhar();
+    var tentativas = 0;
+    acompanhando = setInterval(function () {
+      tentativas++;
+      if (tentativas > 100) return pararDeAcompanhar(); // ~5 minutos
+      sbFetch("/rest/v1/presentes?select=recebido&id=eq." + encodeURIComponent(presenteId))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (linhas) {
+          if (!linhas || !linhas.length) return;
+          if (Number(linhas[0].recebido) > recebidoAntes) {
+            pararDeAcompanhar();
+            var aviso = $("mp-status");
+            aviso.textContent = "Pagamento confirmado. Obrigado de coração!";
+            aviso.classList.add("is-pago");
+            carregarPresentesDoBanco().then(montarPresentes);
+          }
+        })
+        .catch(function () { /* silencioso: tenta de novo no próximo ciclo */ });
+    }, 3000);
+  }
+
+  function montarPagamentoMp() {
+    if (!SB) return;
+
+    function erro(msg) {
+      var el = $("mp-erro");
+      el.textContent = msg;
+      el.hidden = false;
+    }
+
+    $("mp-gerar").addEventListener("click", function () {
+      if (!itemAtual) return;
+      var nome = $("mp-nome").value.trim();
+      var email = $("mp-email").value.trim();
+      $("mp-erro").hidden = true;
+
+      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        $("mp-email").focus();
+        return erro("Precisamos de um e-mail válido para enviar o comprovante.");
+      }
+
+      var botao = $("mp-gerar");
+      botao.disabled = true;
+      botao.textContent = "Gerando…";
+      var recebidoAntes = Number(itemAtual.recebido) || 0;
+
+      fetch(SB.url + "/functions/v1/criar-pix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SB.chave },
+        body: JSON.stringify({
+          presenteId: itemAtual.id,
+          valor: valorEscolhido,
+          nome: nome,
+          email: email,
+        }),
+      })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.d && res.d.erro ? res.d.erro : "Não foi possível gerar o PIX.");
+          if (res.d.qrCodeBase64) {
+            $("mp-qr-img").src = "data:image/png;base64," + res.d.qrCodeBase64;
+            $("mp-qr-img").parentNode.hidden = false;
+          } else {
+            $("mp-qr-img").parentNode.hidden = true;
+          }
+          $("mp-copiar").dataset.codigo = res.d.copiaECola || "";
+          $("mp-resultado").hidden = false;
+          botao.hidden = true;
+          acompanharPagamento(itemAtual.id, recebidoAntes);
+        })
+        .catch(function (e) {
+          botao.disabled = false;
+          botao.textContent = "Gerar PIX";
+          erro(e.message || "Não foi possível gerar o PIX agora. Tente de novo.");
+        });
+    });
+
+    var tempoCopia = null;
+    $("mp-copiar").addEventListener("click", function () {
+      var botao = this;
+      var codigo = botao.dataset.codigo || "";
+      if (!codigo) return;
+      function feito() {
+        botao.classList.add("is-copied");
+        botao.textContent = "Código copiado!";
+        clearTimeout(tempoCopia);
+        tempoCopia = setTimeout(function () {
+          botao.classList.remove("is-copied");
+          botao.textContent = "Copiar código PIX";
+        }, 2200);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(codigo).then(feito, function () { copiaManual(codigo, feito); });
+      } else {
+        copiaManual(codigo, feito);
+      }
+    });
   }
 
   function montarModal() {
@@ -610,6 +789,19 @@
      Sem URL, o envio é apenas simulado e nada é gravado.
      ------------------------------------------------------------------ */
   function enviarParaPlanilha(dados) {
+    // Com o Supabase ligado, a confirmação de presença vai para o banco.
+    if (SB && dados.tipo === "rsvp") {
+      return sbFetch("/rest/v1/rsvps", {
+        metodo: "POST",
+        prefer: "return=minimal",
+        corpo: { nome: dados.nome, observacoes: dados.observacoes || null },
+      }).then(function (r) {
+        if (!r.ok) console.warn("Não consegui gravar o RSVP no Supabase:", r.status);
+      }).catch(function (e) {
+        console.warn("Falha de rede ao gravar o RSVP:", e);
+      });
+    }
+
     var url = SITE.rsvp.googleSheetsUrl;
     if (!url) {
       return new Promise(function (ok) { setTimeout(ok, 900); });
@@ -677,8 +869,18 @@
   montarNavegacao();
   montarPresentes();
   montarModal();
+  montarPagamentoMp();
   montarEntradas();
   montarParallax();
   montarRsvp();
-  sincronizarPresentes();
+
+  if (SB) {
+    // Lista de presentes vinda do banco (com o total já recebido de cada um).
+    carregarPresentesDoBanco().then(function (deuCerto) {
+      if (deuCerto) montarPresentes();
+    });
+  } else {
+    // Sem Supabase: mantém a sincronia opcional pela planilha do Google.
+    sincronizarPresentes();
+  }
 })();

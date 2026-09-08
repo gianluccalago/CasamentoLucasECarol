@@ -850,7 +850,29 @@ body.travado { overflow: hidden; }
 .modal__chave { font-family: var(--font-micro); font-size: 15px; word-break: break-all; }
 
 .modal__qr { margin: 0; }
-.modal__qr img { width: min(170px, 60%); margin-inline: auto; border-radius: var(--radius-card); }
+.modal__qr img { width: min(190px, 66%); margin-inline: auto; border-radius: var(--radius-card); }
+
+#modal-modo-chave,
+#modal-modo-mp,
+#mp-resultado { display: grid; gap: 12px; }
+
+.modal__erro {
+  margin: 0;
+  font-size: 15px;
+  color: #A02D0F;
+  text-align: left;
+}
+
+.modal__aviso {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.modal__aviso.is-pago {
+  color: var(--leaf-deep);
+  font-weight: 500;
+}
 
 /* ==========================================================================
    4 · RSVP
