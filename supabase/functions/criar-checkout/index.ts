@@ -1,10 +1,15 @@
 // ==========================================================================
-// FUNÇÃO: criar-pix
+// FUNÇÃO: criar-checkout
 // --------------------------------------------------------------------------
-// Recebe do site: qual presente, quanto a pessoa quer contribuir e seus
-// dados. Cria a cobrança PIX no Mercado Pago e devolve o QR Code.
+// Só é usada por quem escolhe PAGAR PARCELADO NO CARTÃO. Quem paga por PIX
+// não passa por aqui: o QR Code é gerado no próprio navegador e o dinheiro
+// vai direto para a conta do casal, sem taxa e sem intermediário.
 //
-// O token do Mercado Pago vive SÓ aqui, no servidor. Ele nunca chega ao
+// Aqui criamos uma "preferência de pagamento" no Mercado Pago e devolvemos
+// o endereço do checkout dele, onde o convidado escolhe o cartão e o número
+// de parcelas.
+//
+// O token do Mercado Pago vive SÓ aqui, no servidor. Nunca chega ao
 // navegador do convidado.
 //
 // Segredos necessários (Supabase → Edge Functions → Secrets):
@@ -87,6 +92,7 @@ Deno.serve(async (req) => {
         nome: (nome || "").slice(0, 120) || null,
         email: email.slice(0, 160),
         mensagem: (mensagem || "").slice(0, 1000) || null,
+        forma: "cartao",
         status: "pendente",
       })
       .select("id")
@@ -97,9 +103,10 @@ Deno.serve(async (req) => {
       return responder({ erro: "Não foi possível iniciar o pagamento." }, 500);
     }
 
-    // Cobrança PIX no Mercado Pago.
-    const expiraEm = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
-    const resposta = await fetch("https://api.mercadopago.com/v1/payments", {
+    const site = (Deno.env.get("SITE_URL") || "").replace(/\/+$/, "");
+
+    // Preferência de pagamento: é o "carrinho" que o Mercado Pago abre.
+    const resposta = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${Deno.env.get("MP_ACCESS_TOKEN")}`,
@@ -108,40 +115,50 @@ Deno.serve(async (req) => {
         "X-Idempotency-Key": contribuicao.id,
       },
       body: JSON.stringify({
-        transaction_amount: valorFinal,
-        description: `Presente de casamento — ${presente.nome}`,
-        payment_method_id: "pix",
-        payer: { email, first_name: (nome || "Convidado").slice(0, 60) },
+        items: [{
+          id: presente.id,
+          title: `Presente de casamento — ${presente.nome}`,
+          quantity: 1,
+          currency_id: "BRL",
+          unit_price: valorFinal,
+        }],
+        payer: { name: (nome || "Convidado").slice(0, 60), email },
         external_reference: contribuicao.id,
         notification_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mp-webhook`,
-        date_of_expiration: expiraEm.toISOString(),
+        statement_descriptor: "CASAMENTO",
+        // Esta rota é a do cartão parcelado; quem quer PIX usa o QR Code
+        // do site, sem taxa. Por isso excluímos o PIX daqui.
+        payment_methods: {
+          excluded_payment_types: [{ id: "ticket" }, { id: "bank_transfer" }],
+          installments: 12,
+        },
+        back_urls: site
+          ? { success: `${site}/#presentes`, pending: `${site}/#presentes`, failure: `${site}/#presentes` }
+          : undefined,
+        auto_return: site ? "approved" : undefined,
       }),
     });
 
-    const pagamento = await resposta.json();
+    const preferencia = await resposta.json();
 
-    if (!resposta.ok) {
-      console.error("Mercado Pago recusou a cobrança:", pagamento);
+    if (!resposta.ok || !preferencia.init_point) {
+      console.error("Mercado Pago recusou a preferência:", preferencia);
       await db.from("contribuicoes").update({ status: "recusado" }).eq("id", contribuicao.id);
-      return responder({ erro: "O Mercado Pago não conseguiu gerar o PIX agora." }, 502);
+      return responder({ erro: "O Mercado Pago não conseguiu abrir o pagamento agora." }, 502);
     }
 
     await db
       .from("contribuicoes")
-      .update({ mp_payment_id: String(pagamento.id) })
+      .update({ mp_preference_id: String(preferencia.id) })
       .eq("id", contribuicao.id);
 
-    const dados = pagamento?.point_of_interaction?.transaction_data ?? {};
     return responder({
       contribuicaoId: contribuicao.id,
-      pagamentoId: String(pagamento.id),
       valor: valorFinal,
-      copiaECola: dados.qr_code ?? null,       // texto para colar no app do banco
-      qrCodeBase64: dados.qr_code_base64 ?? null, // imagem PNG em base64
-      expiraEm: expiraEm.toISOString(),
+      urlPagamento: preferencia.init_point,
     });
   } catch (erro) {
-    console.error("Erro inesperado em criar-pix:", erro);
-    return responder({ erro: "Erro inesperado ao gerar o PIX." }, 500);
+    console.error("Erro inesperado em criar-checkout:", erro);
+    return responder({ erro: "Erro inesperado ao abrir o pagamento." }, 500);
   }
 });

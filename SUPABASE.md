@@ -1,27 +1,34 @@
-# Presentes com PIX automático — Supabase + Mercado Pago
+# Cartão parcelado — Supabase + Mercado Pago
 
-Este guia liga o site ao seu projeto Supabase e ao Mercado Pago para que,
-**quando alguém pagar o PIX de um presente, o site marque sozinho o item
-como CONQUISTADO** — sem vocês precisarem conferir o banco e atualizar nada.
+**Este guia é opcional.** O site já recebe presentes por **PIX sem taxa
+nenhuma**, com QR Code gerado na hora e o valor do presente já preenchido —
+isso funciona sozinho, sem servidor, sem cadastro e sem intermediário. O
+dinheiro cai direto na conta de vocês.
 
-Leva cerca de 40 minutos na primeira vez. Vá com calma: cada passo tem o
-que clicar e o que colar.
+Este guia serve para **acrescentar uma segunda forma de pagamento**: cartão
+de crédito parcelado, para quem preferir dividir o valor. Nesse caso o
+pagamento passa pelo Mercado Pago, que cobra taxa.
 
 ---
 
-## Antes de começar: vale a pena?
+## As duas formas, lado a lado
 
-| | PIX direto (como está hoje) | Mercado Pago (este guia) |
+| | PIX (já está funcionando) | Cartão parcelado (este guia) |
 |---|---|---|
-| Taxa | **Nenhuma** — vocês recebem 100% | O Mercado Pago cobra uma taxa por PIX recebido (confira a atual em *Custos* no painel dele) |
-| Confirmação | Manual: vocês veem o extrato e atualizam | **Automática**: cai o PIX, o site atualiza |
+| Taxa | **Nenhuma** — vocês recebem 100% | O Mercado Pago desconta taxa; confira a sua em *Custos*, no painel dele |
+| Parcelamento | Não | Sim, até 12x |
 | Dinheiro | Direto na conta de vocês | Fica na conta Mercado Pago; vocês transferem depois |
-| Trabalho de configuração | Nenhum | Este guia |
+| Quem confirma | Vocês, olhando o extrato | **Automático**: o site marca o presente sozinho |
+| Configuração | Só preencher a chave no `config.js` | Este guia (~40 min) |
 
-Se a lista tiver poucos itens, o PIX direto resolve bem. Se forem muitos
-convidados e vocês não quiserem ficar conferindo extrato, o automático
-compensa. Dá para voltar atrás a qualquer momento: é só apagar a URL do
-Supabase no `config.js`.
+Vale a pena? Se a maioria dos convidados vai pagar à vista, o PIX resolve e
+você não precisa de nada disto. O cartão ajuda em presentes mais caros, em
+que alguém só consegue participar parcelando.
+
+> **Antes de tudo, confira a chave PIX.** No `config.js`, os campos
+> `chavePix`, `titular` e `cidade` são o que vai dentro do QR Code. Um erro
+> ali manda o dinheiro para a conta errada. Faça um teste de R$ 1,00 com o
+> seu próprio celular antes de divulgar o site.
 
 ---
 
@@ -52,7 +59,7 @@ regras de segurança e a lista de presentes inicial.
    o dinheiro** (pode ser pessoa física).
 2. Vá em **Suas integrações** → **Criar aplicação**.
    - Nome: `Site do casamento`
-   - Produto: **Checkout API** (o que permite gerar PIX pelo servidor)
+   - Produto: **Checkout Pro** (o que permite cartão parcelado)
 3. Aberta a aplicação, vá em **Credenciais de produção** e copie o
    **Access Token**. Ele começa com `APP_USR-`.
 
@@ -66,8 +73,8 @@ regras de segurança e a lista de presentes inicial.
    - **Evento:** marque **Pagamentos** (`payment`)
    - Salve e depois clique em **gerar chave secreta**. Copie essa chave.
 
-5. Confirme que o **PIX está habilitado** na conta (o painel avisa se
-   faltar cadastrar chave PIX ou completar dados).
+5. Confirme que a conta está habilitada a receber cartão (o painel avisa
+   se faltar completar algum dado cadastral).
 
 ---
 
@@ -105,7 +112,7 @@ supabase login
 supabase link --project-ref SEU_PROJECT_ID
 
 # 4. publicar as funções
-supabase functions deploy criar-pix
+supabase functions deploy criar-checkout
 supabase functions deploy mp-webhook --no-verify-jwt
 ```
 
@@ -116,8 +123,8 @@ supabase functions deploy mp-webhook --no-verify-jwt
 ### Caminho B — pelo painel, sem instalar nada
 
 No Supabase: **Edge Functions** → **Deploy a new function** → *Via Editor*.
-Crie uma função chamada `criar-pix` e cole o conteúdo de
-`supabase/functions/criar-pix/index.ts`. Repita para `mp-webhook`, colando
+Crie uma função chamada `criar-checkout` e cole o conteúdo de
+`supabase/functions/criar-checkout/index.ts`. Repita para `mp-webhook`, colando
 `supabase/functions/mp-webhook/index.ts` — e, nas configurações dessa
 segunda, **desmarque a verificação de JWT**.
 
@@ -144,33 +151,39 @@ supabase: {
 
 3. Publique o site (commit + push; o Render atualiza sozinho).
 
-Pronto: a lista de presentes passa a vir do Supabase, o botão gera um PIX
-de verdade e o pagamento confirmado marca o item como conquistado.
+Pronto: a lista de presentes passa a vir do Supabase e aparece, abaixo do
+PIX, a opção de parcelar no cartão. Pagamentos por cartão marcam o presente
+como conquistado sozinhos.
 
-**Enquanto esses campos estiverem vazios, nada muda** — o site continua
-funcionando como hoje, com a lista do `config.js`.
+**Enquanto esses campos estiverem vazios, nada muda** — o site continua com
+o PIX (que não depende disto) e a lista do `config.js`.
 
 ---
 
 ## Parte 6 — Testar (10 min)
 
-Faça um teste de verdade, com valor pequeno:
+Teste as duas formas, de verdade, com valores pequenos:
 
+**PIX** (não depende deste guia):
 1. Abra o site, escolha um presente e clique em **Presentear**.
-2. Escolha "Outro valor" e digite **5,00**.
-3. Preencha nome e e-mail e gere o PIX.
-4. Pague com o app do seu banco (o dinheiro cai na sua conta Mercado Pago).
-5. Em até um minuto, recarregue o site: o valor recebido deve ter subido.
+2. Em "Outro valor", digite **1,00**.
+3. Escaneie o QR com o app do seu banco. Confira se aparece **o seu nome**
+   como recebedor e **R$ 1,00** como valor. Pague.
+4. O dinheiro cai direto na conta — sem taxa e sem passar por ninguém.
+
+**Cartão parcelado:**
+1. No mesmo modal, role até "Prefere parcelar no cartão?".
+2. Preencha nome e e-mail e clique em **Ir para o pagamento**.
+3. Você vai para o Mercado Pago. Pague **R$ 5,00** no cartão.
+4. Em até um minuto, recarregue o site: o valor recebido deve ter subido.
    No Supabase, **Table Editor** → `contribuicoes` mostra a linha com
    status `aprovado`.
 
-Se não atualizar, veja **Edge Functions** → `mp-webhook` → **Logs**. As
-mensagens de erro estão em português e dizem o que houve.
+Se o cartão não atualizar, veja **Edge Functions** → `mp-webhook` →
+**Logs**. As mensagens estão em português e dizem o que houve.
 
-Para zerar depois do teste: em `contribuicoes`, apague a linha do teste —
-o total do presente se ajusta sozinho.
-
----
+Para zerar depois: em `contribuicoes`, apague as linhas de teste — o total
+do presente se ajusta sozinho.
 
 ## Perguntas comuns
 
@@ -187,9 +200,15 @@ Não. O navegador não tem permissão de escrever em `contribuicoes`, e o
 site só considera aprovado o que o Mercado Pago confirma — a função ainda
 confere se o valor pago bate com o combinado.
 
-**E se um convidado gerar o PIX e não pagar?**
-A contribuição fica `pendente` e não conta no total. O PIX expira em 30
-minutos.
+**E se um convidado começar o pagamento no cartão e desistir?**
+A contribuição fica `pendente` e não conta no total.
+
+**Os presentes pagos por PIX aparecem como conquistados sozinhos?**
+Não — o PIX cai direto na conta de vocês, sem passar pelo Mercado Pago, e
+por isso o site não fica sabendo. Ao ver o dinheiro no extrato, atualize a
+coluna `recebido` do presente no **Table Editor** (ou o campo `recebido` no
+`config.js`, se não estiver usando o Supabase). O identificador que aparece
+no seu extrato é o nome do presente, o que ajuda a reconhecer.
 
 **Onde fica o dinheiro?**
 Na conta Mercado Pago. Transfiram para a conta bancária quando quiserem.
@@ -199,13 +218,13 @@ Na conta Mercado Pago. Transfiram para a conta bancária quando quiserem.
 ## Um aviso honesto
 
 Escrevi esta integração seguindo a API do Mercado Pago (endpoint
-`POST /v1/payments` com `payment_method_id: "pix"`, e validação do webhook
-por `x-signature`). **Não consegui acessar a documentação oficial durante o
+`POST /checkout/preferences` para o checkout parcelado, e validação do
+webhook por `x-signature`). **Não consegui acessar a documentação oficial durante o
 desenvolvimento** — o domínio do Mercado Pago está bloqueado no ambiente
 onde trabalho. A estrutura é a padrão e estável há anos, mas antes de
 divulgar o site aos convidados, faça o teste da Parte 6 com R$ 5,00. É o
 que confirma que está tudo certo de ponta a ponta.
 
 Se algum campo tiver mudado, o log da função (**Edge Functions** →
-`criar-pix` → **Logs**) mostra a resposta exata do Mercado Pago, e o ajuste
+`criar-checkout` → **Logs**) mostra a resposta exata do Mercado Pago, e o ajuste
 é rápido.

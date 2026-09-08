@@ -156,10 +156,24 @@ const SITE = {
     subtitulo: "",
     texto: "Preparamos esta lista de presentes para quem desejar nos presentear de forma prática e especial. Cada item representa um gesto de carinho que fará parte do início da nossa vida juntos. Agradecemos imensamente por todo o apoio e por celebrarem este momento ao nosso lado.",
 
-    // Dados do PIX (usados por todos os presentes).
-    banco: "Nome do banco (edite aqui)",
-    titular: "Nome do titular (edite aqui)",
+    /* ----------------------------------------------------------------
+       DADOS DO PIX — usados para gerar o QR Code de cada presente
+       ----------------------------------------------------------------
+       O site monta sozinho um QR Code com o valor já preenchido. O
+       dinheiro cai direto na conta de vocês, sem taxa e sem
+       intermediário.
+
+       ATENÇÃO: confira estes três campos com muito cuidado. Um erro na
+       chave faz o dinheiro ir para a conta errada.
+       - chavePix: CPF (só números), celular (+5541999999999), e-mail
+         ou chave aleatória.
+       - titular: nome de quem recebe. Sem acentos, até 25 letras.
+       - cidade: cidade da conta. Sem acentos, até 15 letras.
+       ---------------------------------------------------------------- */
     chavePix: "chave-pix@exemplo.com",
+    titular: "MARIA CAROLINA",
+    cidade: "SAO JOSE DOS P",
+    banco: "Nome do banco (edite aqui)",
 
     // A LISTA. Copie um bloco inteiro para criar um novo presente.
     itens: [
@@ -182,13 +196,31 @@ const SITE = {
     rotuloValorTotal: "Valor total",
     rotuloEscolhaValor: "Quanto você quer contribuir?",
     rotuloValorLivre: "Outro valor",
-    rotuloCopiarPix: "Copiar chave PIX",
-    feedbackCopiado: "Chave copiada!",
-    rotuloComoPagar: "Copie a chave abaixo, faça o PIX no seu banco e pronto — o carinho já está a caminho.",
     rotuloAvisar: "Avisar que presenteei",
     rotuloAvisarEnviado: "Obrigado! Anotamos com carinho.",
-    // OPCIONAL: imagem do QR Code do PIX ("" para não exibir).
-    qrCodeImagem: "",
+
+    /* --- Textos da forma principal: PIX ----------------------------- */
+    pixTitulo: "Pagar com PIX",
+    pixNota: "Abra o app do seu banco, escaneie o código e pronto. O valor já vai preenchido.",
+    pixRotuloCodigo: "Ou copie o código PIX:",
+    pixBotaoCopiar: "Copiar código PIX",
+    pixCopiado: "Código copiado!",
+    pixRotuloTitular: "Recebedor",
+    pixRotuloChave: "Chave PIX",
+
+    /* --- Textos da alternativa: cartão parcelado --------------------
+       Esta opção só aparece se o Supabase estiver configurado
+       (veja SUPABASE.md). Serve para quem prefere parcelar no cartão.
+       Ajuste o aviso da taxa conforme as condições da sua conta no
+       Mercado Pago — as taxas mudam e são negociadas por conta.
+       ---------------------------------------------------------------- */
+    cartaoOu: "ou",
+    cartaoTitulo: "Prefere parcelar no cartão?",
+    cartaoNota: "O pagamento é feito pelo Mercado Pago, que permite parcelar. Nesse caso há taxa da operadora sobre o valor — no PIX acima, não há nenhuma.",
+    cartaoRotuloNome: "Seu nome",
+    cartaoRotuloEmail: "Seu e-mail",
+    cartaoBotao: "Ir para o pagamento",
+    cartaoBotaoIndo: "Abrindo…",
   },
 
   /* ------------------------------------------------------------------

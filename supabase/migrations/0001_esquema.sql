@@ -30,18 +30,27 @@ create table if not exists public.presentes (
 --    do servidor (que usam a chave secreta) mexem nela.
 -- --------------------------------------------------------------------------
 create table if not exists public.contribuicoes (
-  id             uuid primary key default gen_random_uuid(),
-  presente_id    text not null references public.presentes(id) on delete cascade,
-  valor          numeric(10,2) not null check (valor > 0),
-  nome           text,
-  email          text,
-  mensagem       text,
-  mp_payment_id  text unique,                     -- id do pagamento no Mercado Pago
-  status         text not null default 'pendente'
-                 check (status in ('pendente','aprovado','recusado','expirado')),
-  criado_em      timestamptz not null default now(),
-  pago_em        timestamptz
+  id                uuid primary key default gen_random_uuid(),
+  presente_id       text not null references public.presentes(id) on delete cascade,
+  valor             numeric(10,2) not null check (valor > 0),
+  nome              text,
+  email             text,
+  mensagem          text,
+  -- 'pix'    = PIX direto na conta do casal (sem taxa, confirmação de vocês)
+  -- 'cartao' = cartão parcelado pelo Mercado Pago (confirmação automática)
+  forma             text not null default 'cartao' check (forma in ('pix','cartao')),
+  mp_payment_id     text unique,                  -- id do pagamento no Mercado Pago
+  mp_preference_id  text,                         -- id da preferência de checkout
+  status            text not null default 'pendente'
+                    check (status in ('pendente','aprovado','recusado','expirado')),
+  criado_em         timestamptz not null default now(),
+  pago_em           timestamptz
 );
+
+-- Se a tabela já existia de uma versão anterior, acrescenta as colunas novas.
+alter table public.contribuicoes
+  add column if not exists forma text not null default 'cartao',
+  add column if not exists mp_preference_id text;
 
 create index if not exists idx_contribuicoes_presente on public.contribuicoes(presente_id);
 create index if not exists idx_contribuicoes_status   on public.contribuicoes(status);

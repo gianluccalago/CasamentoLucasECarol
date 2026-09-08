@@ -34,34 +34,33 @@ no campo correspondente.
 As **fotos dos presentes** (`presentes.itens[].foto`) ainda usam ilustrações
 de exemplo — troque por fotos quadradas (1:1) dos itens.
 
-### Lista de presentes e o selo "Conquistado!"
+### Lista de presentes: como o convidado paga
 
 Cada item tem `valor`, `unidades` e `recebido` (quanto já entrou, em reais).
-O convidado escolhe pagar o valor cheio ou uma parte, e o site mostra a chave
-PIX. O selo **CONQUISTADO!** aparece sozinho quando `recebido` alcança
-`valor × unidades` — ou seja, só depois que **todas** as unidades foram
-integralmente pagas. Antes disso, o cartão mostra o progresso.
+O convidado escolhe pagar o valor cheio ou uma parte, e tem duas formas:
 
-Há duas formas de marcar o que já foi recebido:
+**1. PIX — principal, sem taxa nenhuma.** O site monta na hora um QR Code
+com o valor já preenchido e o dinheiro cai direto na conta de vocês, sem
+intermediário. Isso funciona sem servidor: o código PIX (padrão BR Code do
+Banco Central) é gerado no próprio navegador.
 
-1. **Direto no `config.js`** — edite o campo `recebido` do item e publique.
-2. **Pela planilha do Google** (mais prático) — o casal atualiza os valores
-   na planilha e o site se atualiza sozinho. Veja
-   [`rsvp-apps-script.gs`](rsvp-apps-script.gs).
+> Os campos `chavePix`, `titular` e `cidade` no `config.js` são o que vai
+> dentro do QR Code. **Confira com cuidado** — um erro ali manda o dinheiro
+> para a conta errada. Faça um teste de R$ 1,00 antes de divulgar o site.
 
-> O PIX não avisa o site automaticamente quando alguém paga. Por isso, neste
-> modo, a confirmação é sempre de vocês, depois de conferir a entrada no
-> banco. O convidado pode clicar em "Avisar que presenteei", o que registra
-> o aviso na planilha para facilitar a conferência.
+**2. Cartão parcelado — opcional.** Aparece abaixo do PIX apenas se o
+Supabase estiver configurado. Serve para quem prefere dividir o valor; nesse
+caso o Mercado Pago cobra taxa. Veja **[SUPABASE.md](SUPABASE.md)**.
 
-### Opção 3 — PIX automático (Supabase + Mercado Pago)
+O selo **CONQUISTADO!** aparece quando `recebido` alcança `valor × unidades`
+— ou seja, só depois que **todas** as unidades foram pagas. Antes disso, o
+cartão mostra o progresso. Para atualizar o quanto já foi recebido:
 
-Existe um terceiro caminho, em que o pagamento do PIX marca o presente como
-conquistado **sozinho**, sem vocês conferirem nada: o site gera a cobrança
-pelo Mercado Pago e recebe a confirmação por webhook. O passo a passo
-completo está em **[SUPABASE.md](SUPABASE.md)** — inclui o SQL das tabelas,
-as duas funções de servidor e a comparação de custos (o Mercado Pago cobra
-taxa por PIX recebido; o PIX direto não).
+- **PIX**: como o dinheiro vai direto para vocês, o site não fica sabendo.
+  Ao ver a entrada no extrato, atualize o campo `recebido` do item (no
+  `config.js` ou, se estiver usando o Supabase, no Table Editor). O nome do
+  presente aparece como identificador no extrato, o que ajuda a reconhecer.
+- **Cartão**: é automático, confirmado pelo Mercado Pago.
 
 ### Confirmações de presença (RSVP)
 

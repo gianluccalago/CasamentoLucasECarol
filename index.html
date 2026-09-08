@@ -314,44 +314,50 @@
         <input class="campo__input" id="modal-livre" type="text" inputmode="decimal" autocomplete="off">
       </div>
 
-      <!-- Modo simples: chave PIX fixa do casal (sem Supabase configurado) -->
-      <div id="modal-modo-chave">
-        <p class="modal__como" id="modal-como"></p>
-        <dl class="modal__pix">
-          <div><dt>Banco</dt><dd id="modal-banco"></dd></div>
-          <div><dt>Titular</dt><dd id="modal-titular"></dd></div>
-          <div><dt>Chave PIX</dt><dd class="modal__chave" id="modal-chave"></dd></div>
+      <!-- ================= PIX — forma principal, sem taxa ================= -->
+      <section class="pagar" id="pagar-pix">
+        <h4 class="pagar__titulo" id="pix-titulo"></h4>
+        <p class="pagar__nota" id="pix-nota"></p>
+
+        <figure class="pagar__qr" id="pix-qr" aria-hidden="false"></figure>
+
+        <p class="pagar__rotulo" id="pix-rotulo-codigo"></p>
+        <p class="pagar__codigo" id="pix-codigo"></p>
+        <button class="botao botao--primario" id="pix-copiar" type="button"></button>
+
+        <dl class="pagar__dados">
+          <div><dt id="pix-rot-titular"></dt><dd id="pix-titular"></dd></div>
+          <div><dt id="pix-rot-chave"></dt><dd class="pagar__chave" id="pix-chave"></dd></div>
         </dl>
-        <figure class="modal__qr" id="modal-qr" hidden><img id="modal-qr-img" alt="QR Code do PIX" loading="lazy"></figure>
-        <button class="botao botao--primario" id="modal-copiar" type="button"></button>
+
         <button class="botao botao--texto" id="modal-avisar" type="button"></button>
-      </div>
+      </section>
 
-      <!-- Modo automático: gera um PIX pelo Mercado Pago (Supabase ligado) -->
-      <div id="modal-modo-mp" hidden>
-        <div class="campo">
-          <label class="campo__rotulo" for="mp-nome">Seu nome</label>
-          <input class="campo__input" id="mp-nome" type="text" autocomplete="name">
-        </div>
-        <div class="campo">
-          <label class="campo__rotulo" for="mp-email">Seu e-mail</label>
-          <input class="campo__input" id="mp-email" type="email" autocomplete="email"
-                 placeholder="para o comprovante">
-        </div>
-        <p class="modal__erro" id="mp-erro" hidden></p>
-        <button class="botao botao--primario" id="mp-gerar" type="button">Gerar PIX</button>
+      <!-- ============ CARTÃO — alternativa para quem quer parcelar ========= -->
+      <section class="pagar pagar--secundario" id="pagar-cartao" hidden>
+        <div class="pagar__ou"><span id="cartao-ou"></span></div>
+        <h4 class="pagar__titulo" id="cartao-titulo"></h4>
+        <p class="pagar__nota" id="cartao-nota"></p>
 
-        <div id="mp-resultado" hidden>
-          <p class="modal__como">Aponte a câmera do seu banco para o código, ou copie o texto abaixo.</p>
-          <figure class="modal__qr"><img id="mp-qr-img" alt="QR Code do PIX"></figure>
-          <button class="botao botao--primario" id="mp-copiar" type="button">Copiar código PIX</button>
-          <p class="modal__aviso" id="mp-status">Assim que o pagamento cair, o presente aparece como conquistado.</p>
+        <div id="cartao-formulario">
+          <div class="campo">
+            <label class="campo__rotulo" for="cartao-nome" id="cartao-rot-nome"></label>
+            <input class="campo__input" id="cartao-nome" type="text" autocomplete="name">
+          </div>
+          <div class="campo">
+            <label class="campo__rotulo" for="cartao-email" id="cartao-rot-email"></label>
+            <input class="campo__input" id="cartao-email" type="email" autocomplete="email">
+          </div>
+          <p class="modal__erro" id="cartao-erro" hidden></p>
+          <button class="botao botao--outline" id="cartao-ir" type="button"></button>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 
   <script src="config.js"></script>
+  <script src="js/vendor/qrcode.js"></script>
+  <script src="js/pix.js"></script>
   <script src="js/main.js" defer></script>
 </body>
 </html>

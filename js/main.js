@@ -23,10 +23,10 @@
   /* ------------------------------------------------------------------
      SUPABASE (opcional)
      ------------------------------------------------------------------
-     Se as chaves estiverem preenchidas no config.js, a lista de presentes
-     vem do banco e o PIX é gerado pelo Mercado Pago, com confirmação
-     automática. Se não estiverem, tudo segue funcionando com a lista
-     escrita no config.js. Passo a passo: SUPABASE.md
+     O PIX funciona sempre, sem servidor nenhum. O Supabase é opcional e
+     serve para duas coisas: guardar a lista de presentes no banco e
+     oferecer o pagamento parcelado no cartão. Sem ele, o site funciona
+     com a lista escrita no config.js. Passo a passo: SUPABASE.md
      ------------------------------------------------------------------ */
   var SB = (SITE.supabase && SITE.supabase.url && SITE.supabase.anonKey)
     ? { url: SITE.supabase.url.replace(/\/+$/, ""), chave: SITE.supabase.anonKey }
@@ -533,34 +533,33 @@
       ((item.unidades || 1) > 1 ? " · " + item.unidades + " un." : "");
     $("modal-rotulo-escolha").textContent = SITE.presentes.rotuloEscolhaValor;
     $("modal-rotulo-livre").textContent = SITE.presentes.rotuloValorLivre;
-    $("modal-como").textContent = SITE.presentes.rotuloComoPagar;
-    $("modal-banco").textContent = SITE.presentes.banco;
-    $("modal-titular").textContent = SITE.presentes.titular;
-    $("modal-chave").textContent = SITE.presentes.chavePix;
-    $("modal-copiar").textContent = SITE.presentes.rotuloCopiarPix;
-    $("modal-copiar").classList.remove("is-copied");
-    $("modal-avisar").textContent = SITE.presentes.rotuloAvisar;
+
+    // --- PIX (forma principal, sem taxa)
+    var p = SITE.presentes;
+    $("pix-titulo").textContent = p.pixTitulo;
+    $("pix-nota").textContent = p.pixNota;
+    $("pix-rotulo-codigo").textContent = p.pixRotuloCodigo;
+    $("pix-copiar").textContent = p.pixBotaoCopiar;
+    $("pix-copiar").classList.remove("is-copied");
+    $("pix-rot-titular").textContent = p.pixRotuloTitular;
+    $("pix-titular").textContent = p.titular;
+    $("pix-rot-chave").textContent = p.pixRotuloChave;
+    $("pix-chave").textContent = p.chavePix;
+    $("modal-avisar").textContent = p.rotuloAvisar;
     $("modal-avisar").disabled = false;
 
-    if (SITE.presentes.qrCodeImagem) {
-      $("modal-qr-img").src = SITE.presentes.qrCodeImagem;
-      $("modal-qr").hidden = false;
-    } else {
-      $("modal-qr").hidden = true;
-    }
-
-    // Com o Supabase ligado, o PIX é gerado na hora pelo Mercado Pago.
-    $("modal-modo-chave").hidden = !!SB;
-    $("modal-modo-mp").hidden = !SB;
-    if (SB) {
-      $("mp-resultado").hidden = true;
-      $("mp-erro").hidden = true;
-      $("mp-gerar").disabled = false;
-      $("mp-gerar").textContent = "Gerar PIX";
-      $("mp-status").classList.remove("is-pago");
-      $("mp-status").textContent =
-        "Assim que o pagamento cair, o presente aparece como conquistado.";
-      pararDeAcompanhar();
+    // --- Cartão parcelado (alternativa; exige o Supabase configurado)
+    var temCartao = !!SB;
+    $("pagar-cartao").hidden = !temCartao;
+    if (temCartao) {
+      $("cartao-ou").textContent = p.cartaoOu;
+      $("cartao-titulo").textContent = p.cartaoTitulo;
+      $("cartao-nota").textContent = p.cartaoNota;
+      $("cartao-rot-nome").textContent = p.cartaoRotuloNome;
+      $("cartao-rot-email").textContent = p.cartaoRotuloEmail;
+      $("cartao-ir").textContent = p.cartaoBotao;
+      $("cartao-ir").disabled = false;
+      $("cartao-erro").hidden = true;
     }
 
     // Sugestões: metade, o que falta e o valor cheio de uma unidade
@@ -584,16 +583,36 @@
         b.classList.add("is-ativa");
         valorEscolhido = op.valor;
         $("modal-livre").value = "";
+        atualizarPix();
       });
       cont.appendChild(b);
     });
     valorEscolhido = item.valor;
     cont.querySelectorAll(".modal__opcao")[1].classList.add("is-ativa");
     $("modal-livre").value = "";
+    atualizarPix();
 
     $("modal-presente").hidden = false;
     document.body.classList.add("travado");
     $("modal-fechar").focus();
+  }
+
+  /* Refaz o código PIX e o QR sempre que o valor escolhido muda. */
+  function atualizarPix() {
+    if (!itemAtual) return;
+    var p = SITE.presentes;
+    var codigo = window.PIX.montar({
+      chave: p.chavePix,
+      nome: p.titular,
+      cidade: p.cidade,
+      valor: valorEscolhido,
+      // Identificador curto para o casal reconhecer no extrato.
+      txid: (itemAtual.id || itemAtual.nome || "presente").replace(/[^A-Za-z0-9]/g, "").slice(0, 25),
+    });
+    $("pix-codigo").textContent = codigo;
+    $("pix-copiar").dataset.codigo = codigo;
+    var desenhou = window.PIX.desenharQr($("pix-qr"), codigo);
+    $("pix-qr").hidden = !desenhou;
   }
 
   function fecharModal() {
@@ -637,32 +656,31 @@
     }, 3000);
   }
 
-  function montarPagamentoMp() {
+  function montarPagamentoCartao() {
     if (!SB) return;
 
     function erro(msg) {
-      var el = $("mp-erro");
+      var el = $("cartao-erro");
       el.textContent = msg;
       el.hidden = false;
     }
 
-    $("mp-gerar").addEventListener("click", function () {
+    $("cartao-ir").addEventListener("click", function () {
       if (!itemAtual) return;
-      var nome = $("mp-nome").value.trim();
-      var email = $("mp-email").value.trim();
-      $("mp-erro").hidden = true;
+      var nome = $("cartao-nome").value.trim();
+      var email = $("cartao-email").value.trim();
+      $("cartao-erro").hidden = true;
 
       if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-        $("mp-email").focus();
-        return erro("Precisamos de um e-mail válido para enviar o comprovante.");
+        $("cartao-email").focus();
+        return erro("Precisamos de um e-mail válido para o comprovante.");
       }
 
-      var botao = $("mp-gerar");
+      var botao = $("cartao-ir");
       botao.disabled = true;
-      botao.textContent = "Gerando…";
-      var recebidoAntes = Number(itemAtual.recebido) || 0;
+      botao.textContent = SITE.presentes.cartaoBotaoIndo;
 
-      fetch(SB.url + "/functions/v1/criar-pix", {
+      fetch(SB.url + "/functions/v1/criar-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SB.chave },
         body: JSON.stringify({
@@ -674,44 +692,17 @@
       })
         .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
         .then(function (res) {
-          if (!res.ok) throw new Error(res.d && res.d.erro ? res.d.erro : "Não foi possível gerar o PIX.");
-          if (res.d.qrCodeBase64) {
-            $("mp-qr-img").src = "data:image/png;base64," + res.d.qrCodeBase64;
-            $("mp-qr-img").parentNode.hidden = false;
-          } else {
-            $("mp-qr-img").parentNode.hidden = true;
+          if (!res.ok || !res.d.urlPagamento) {
+            throw new Error(res.d && res.d.erro ? res.d.erro : "Não foi possível abrir o pagamento.");
           }
-          $("mp-copiar").dataset.codigo = res.d.copiaECola || "";
-          $("mp-resultado").hidden = false;
-          botao.hidden = true;
-          acompanharPagamento(itemAtual.id, recebidoAntes);
+          // Leva o convidado ao ambiente seguro do Mercado Pago.
+          window.location.href = res.d.urlPagamento;
         })
         .catch(function (e) {
           botao.disabled = false;
-          botao.textContent = "Gerar PIX";
-          erro(e.message || "Não foi possível gerar o PIX agora. Tente de novo.");
+          botao.textContent = SITE.presentes.cartaoBotao;
+          erro(e.message || "Não foi possível abrir o pagamento agora.");
         });
-    });
-
-    var tempoCopia = null;
-    $("mp-copiar").addEventListener("click", function () {
-      var botao = this;
-      var codigo = botao.dataset.codigo || "";
-      if (!codigo) return;
-      function feito() {
-        botao.classList.add("is-copied");
-        botao.textContent = "Código copiado!";
-        clearTimeout(tempoCopia);
-        tempoCopia = setTimeout(function () {
-          botao.classList.remove("is-copied");
-          botao.textContent = "Copiar código PIX";
-        }, 2200);
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(codigo).then(feito, function () { copiaManual(codigo, feito); });
-      } else {
-        copiaManual(codigo, feito);
-      }
     });
   }
 
@@ -731,26 +722,28 @@
         $("modal-opcoes").querySelectorAll(".modal__opcao").forEach(function (x) {
           x.classList.remove("is-ativa");
         });
+        atualizarPix();
       }
     });
 
     var tempo = null;
-    $("modal-copiar").addEventListener("click", function () {
+    $("pix-copiar").addEventListener("click", function () {
       var botao = this;
+      var codigo = botao.dataset.codigo || "";
+      if (!codigo) return;
       function feito() {
         botao.classList.add("is-copied");
-        botao.textContent = SITE.presentes.feedbackCopiado;
+        botao.textContent = SITE.presentes.pixCopiado;
         clearTimeout(tempo);
         tempo = setTimeout(function () {
           botao.classList.remove("is-copied");
-          botao.textContent = SITE.presentes.rotuloCopiarPix;
+          botao.textContent = SITE.presentes.pixBotaoCopiar;
         }, 2200);
       }
-      var chave = SITE.presentes.chavePix;
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(chave).then(feito, function () { copiaManual(chave, feito); });
+        navigator.clipboard.writeText(codigo).then(feito, function () { copiaManual(codigo, feito); });
       } else {
-        copiaManual(chave, feito);
+        copiaManual(codigo, feito);
       }
     });
 
@@ -869,7 +862,7 @@
   montarNavegacao();
   montarPresentes();
   montarModal();
-  montarPagamentoMp();
+  montarPagamentoCartao();
   montarEntradas();
   montarParallax();
   montarRsvp();
