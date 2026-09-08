@@ -258,6 +258,7 @@
       desistiu = true;
       capa.src = posterFinal;
       stage.classList.add("is-final");
+      ouvirGestos(false);
       // Deixa o vídeo sumir junto com a transição antes de removê-lo.
       try { video.pause(); } catch (e) { /* indiferente */ }
       setTimeout(function () {
@@ -265,42 +266,51 @@
       }, 600);
     }
 
-    var tentativas = 0;
     var comecou = false;
+    var GESTOS = ["touchstart", "pointerdown", "scroll", "keydown", "click"];
+    var ouvindoGestos = false;
+
+    function ouvirGestos(ligar) {
+      if (ligar === ouvindoGestos) return;
+      ouvindoGestos = ligar;
+      GESTOS.forEach(function (ev) {
+        if (ligar) window.addEventListener(ev, tentarTocar, { passive: true });
+        else window.removeEventListener(ev, tentarTocar);
+      });
+    }
+
     function tentarTocar() {
       if (desistiu || comecou || !video.parentNode) return;
       var p = video.play();
       if (p && p.catch) {
         p.catch(function () {
-          tentativas++;
-          // Autoplay barrado: tenta de novo no primeiro gesto do convidado.
-          if (tentativas === 1) {
-            ["touchstart", "pointerdown", "scroll", "keydown"].forEach(function (ev) {
-              window.addEventListener(ev, tentarTocar, { once: true, passive: true });
-            });
-          }
+          // Autoplay barrado (economia de energia, economia de dados):
+          // fica de prontidão para tocar ao primeiro toque na tela.
+          ouvirGestos(true);
         });
       }
     }
 
-    /* Só começa quando houver fôlego de rede para ir até o fim sem
-       engasgar. Em conexão lenta, um vídeo que trava e volta atrás fica
-       pior do que a ilustração parada — por isso esperamos o buffer. */
-    video.addEventListener("canplaythrough", tentarTocar, { once: true });
-    // Rede boa: canplaythrough chega rápido. Rede mediana: seguimos assim
-    // que houver metade do clipe carregada, ou após 4s de espera.
-    var vigiaBuffer = setInterval(function () {
-      if (desistiu || comecou) { clearInterval(vigiaBuffer); return; }
-      if (video.buffered.length && video.duration) {
-        var carregado = video.buffered.end(video.buffered.length - 1);
-        if (carregado >= video.duration * 0.55) tentarTocar();
-      }
-    }, 250);
-    setTimeout(function () { if (!comecou) tentarTocar(); }, 4000);
+    /* Começa o quanto antes: quem abre a página precisa ver a flor
+       desabrochando, não uma imagem parada. Pedimos o play já na criação
+       do elemento e repetimos ao primeiro sinal de dados — o navegador
+       enfileira o pedido e começa assim que puder.
+       (A proteção contra engasgo continua abaixo, no evento "waiting".) */
+    tentarTocar();
+    ["loadedmetadata", "loadeddata", "canplay", "canplaythrough"].forEach(function (ev) {
+      video.addEventListener(ev, tentarTocar);
+    });
+    // Rede muito lenta: insiste por alguns segundos antes de desistir.
+    var insistir = setInterval(function () {
+      if (desistiu || comecou) { clearInterval(insistir); return; }
+      tentarTocar();
+    }, 400);
+    setTimeout(function () { clearInterval(insistir); }, 9000);
 
     video.addEventListener("playing", function () {
       comecou = true;
-      clearInterval(vigiaBuffer);
+      clearInterval(insistir);
+      ouvirGestos(false);
     });
 
     /* Rede insuficiente no meio da reprodução: em vez de deixar o vídeo

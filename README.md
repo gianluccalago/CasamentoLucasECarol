@@ -74,7 +74,9 @@ envio e nada é gravado.
 ## O vídeo do hero
 
 A ilustração em aquarela **toca sozinha uma única vez** ao abrir a página e
-**congela na ilustração completa** — nunca reinicia nem entra em laço.
+**congela na ilustração completa** — nunca reinicia nem entra em laço. O
+clipe dura ~8,4 s (foi acelerado 20%) e começa em menos de 1,5 s nas redes
+comuns, para que ninguém role a página antes de ver a flor desabrochar.
 
 Para o iPhone jamais exibir o botão de play nativo (que aparece quando o
 autoplay é barrado, por exemplo no modo de economia de energia), o vídeo fica
