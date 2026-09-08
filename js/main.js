@@ -150,6 +150,9 @@
     var sub = $("presentes-subtitulo");
     if (SITE.presentes.subtitulo) { sub.textContent = SITE.presentes.subtitulo; } else { sub.hidden = true; }
     $("presentes-texto").textContent = SITE.presentes.texto;
+    $("livre-titulo").textContent = SITE.presentes.livreTitulo;
+    $("livre-nota").textContent = SITE.presentes.livreNota;
+    $("livre-abrir").textContent = SITE.presentes.livreBotao;
 
     // 4 · RSVP
     $("rsvp-titulo").textContent = SITE.rsvp.titulo;
@@ -438,6 +441,7 @@
      integralmente pagas (recebido >= valor × unidades).
      ------------------------------------------------------------------ */
   var itemAtual = null;
+  var contribuicaoLivre = false;
   var valorEscolhido = 0;
 
   function estadoItem(item) {
@@ -537,21 +541,18 @@
     montarEntradas();
   }
 
-  function abrirModal(indice) {
-    var item = SITE.presentes.itens[indice];
-    var e = estadoItem(item);
-    itemAtual = item;
+  /* Prepara a janela nos dois modos: um presente da lista (com valores
+     prontos) ou uma contribuição de valor livre (a pessoa digita). */
+  function prepararModal(modoLivre) {
+    var p = SITE.presentes;
 
-    $("modal-foto").src = item.foto;
-    $("modal-foto").alt = item.nome;
-    $("modal-nome").textContent = item.nome;
-    $("modal-valor").textContent = SITE.presentes.rotuloValorTotal + ": " + moeda(item.valor) +
-      ((item.unidades || 1) > 1 ? " · " + item.unidades + " un." : "");
-    $("modal-rotulo-escolha").textContent = SITE.presentes.rotuloEscolhaValor;
-    $("modal-rotulo-livre").textContent = SITE.presentes.rotuloValorLivre;
+    $("modal-rotulo-escolha").textContent = modoLivre ? "" : p.rotuloEscolhaValor;
+    $("modal-rotulo-escolha").hidden = !!modoLivre;
+    $("modal-opcoes").hidden = !!modoLivre;
+    $("modal-campo-livre").hidden = !modoLivre;
+    $("modal-rotulo-livre").textContent = p.rotuloValorLivre;
 
     // --- PIX (forma principal, sem taxa)
-    var p = SITE.presentes;
     $("pix-titulo").textContent = p.pixTitulo;
     $("pix-nota").textContent = p.pixNota;
     $("pix-rotulo-codigo").textContent = p.pixRotuloCodigo;
@@ -563,18 +564,44 @@
     $("pix-chave").textContent = p.chavePix;
     $("pix-parcelar").textContent = p.pixParcelar;
 
-    // --- Confirmação: é o que reserva o presente para os demais
+    // --- Confirmação
     $("confirmar-ou").textContent = p.confirmarOu;
-    $("confirmar-titulo").textContent = p.confirmarTitulo;
-    $("confirmar-nota").textContent = p.confirmarNota;
+    $("confirmar-titulo").textContent = modoLivre ? p.confirmarTituloLivre : p.confirmarTitulo;
+    $("confirmar-nota").textContent = modoLivre ? p.confirmarNotaLivre : p.confirmarNota;
     $("confirmar-rot-nome").textContent = p.confirmarRotuloNome;
+    $("confirmar-nome").value = "";
     $("confirmar-enviar").disabled = false;
     $("confirmar-erro").hidden = true;
     $("confirmar-formulario").hidden = false;
     $("confirmar-obrigado").hidden = true;
     $("confirmar-obrigado-texto").textContent = p.confirmarObrigado;
+  }
 
-    // Sugestões: metade, o que falta e o valor cheio de uma unidade
+  function mostrarModal() {
+    $("modal-presente").hidden = false;
+    document.body.classList.add("travado");
+    $("modal-fechar").focus();
+  }
+
+  /* Um presente da lista */
+  function abrirModal(indice) {
+    var item = SITE.presentes.itens[indice];
+    var e = estadoItem(item);
+    var p = SITE.presentes;
+    itemAtual = item;
+    contribuicaoLivre = false;
+
+    $("modal-foto").hidden = false;
+    $("modal-foto").src = item.foto;
+    $("modal-foto").alt = item.nome;
+    $("modal-nome").textContent = item.nome;
+    $("modal-valor").hidden = false;
+    $("modal-valor").textContent = p.rotuloValorTotal + ": " + moeda(item.valor) +
+      ((item.unidades || 1) > 1 ? " · " + item.unidades + " un." : "");
+
+    prepararModal(false);
+
+    // Valores prontos: metade, o valor de uma unidade e o que falta.
     var falta = Math.max(0, e.alvo - e.recebido);
     var opcoes = [
       { rotulo: moeda(Math.round(item.valor / 2)), valor: Math.round(item.valor / 2) },
@@ -594,27 +621,50 @@
         cont.querySelectorAll(".modal__opcao").forEach(function (x) { x.classList.remove("is-ativa"); });
         b.classList.add("is-ativa");
         valorEscolhido = op.valor;
-        $("modal-livre").value = "";
         atualizarPix();
       });
       cont.appendChild(b);
     });
     valorEscolhido = item.valor;
     cont.querySelectorAll(".modal__opcao")[1].classList.add("is-ativa");
+    atualizarPix();
+    mostrarModal();
+  }
+
+  /* Contribuição com valor à escolha, sem item da lista */
+  function abrirModalLivre() {
+    var p = SITE.presentes;
+    itemAtual = null;
+    contribuicaoLivre = true;
+    valorEscolhido = 0;
+
+    $("modal-foto").hidden = true;
+    $("modal-nome").textContent = p.livreNomeNoModal;
+    $("modal-valor").hidden = true;
+
+    prepararModal(true);
     $("modal-livre").value = "";
     atualizarPix();
-
-    $("modal-presente").hidden = false;
-    document.body.classList.add("travado");
-    $("modal-fechar").focus();
+    mostrarModal();
+    setTimeout(function () { $("modal-livre").focus(); }, 60);
   }
 
   /* Refaz o código PIX, o QR e o botão de confirmação sempre que o valor
      escolhido muda — assim fica claro que o registro é do valor escolhido,
      seja o total, a metade ou outro. */
   function atualizarPix() {
-    if (!itemAtual) return;
     var p = SITE.presentes;
+    if (!itemAtual && !contribuicaoLivre) return;
+
+    // Sem valor escolhido ainda (modo livre recém-aberto): nada a mostrar.
+    if (!(valorEscolhido > 0)) {
+      $("confirmar-enviar").textContent = p.confirmarBotao;
+      $("pix-codigo").textContent = "";
+      $("pix-copiar").dataset.codigo = "";
+      $("pix-qr").textContent = "";
+      $("pix-qr").hidden = true;
+      return;
+    }
     // Deixa o valor à vista no botão: "Já fiz o PIX de R$ 120"
     $("confirmar-enviar").textContent = p.confirmarBotao + " de " + moeda(valorEscolhido);
     var codigo = window.PIX.montar({
@@ -623,7 +673,8 @@
       cidade: p.cidade,
       valor: valorEscolhido,
       // Identificador curto para o casal reconhecer no extrato.
-      txid: (itemAtual.id || itemAtual.nome || "presente").replace(/[^A-Za-z0-9]/g, "").slice(0, 25),
+      txid: (itemAtual ? (itemAtual.id || itemAtual.nome) : "contribuicao")
+        .replace(/[^A-Za-z0-9]/g, "").slice(0, 25),
     });
     $("pix-codigo").textContent = codigo;
     $("pix-copiar").dataset.codigo = codigo;
@@ -635,6 +686,7 @@
     $("modal-presente").hidden = true;
     document.body.classList.remove("travado");
     itemAtual = null;
+    contribuicaoLivre = false;
   }
 
   /* ------------------------------------------------------------------
@@ -681,11 +733,15 @@
     }
 
     botao.addEventListener("click", function () {
-      if (!itemAtual) return;
+      if (!itemAtual && !contribuicaoLivre) return;
       var p = SITE.presentes;
       var nome = $("confirmar-nome").value.trim();
       $("confirmar-erro").hidden = true;
 
+      if (!(valorEscolhido > 0)) {
+        $("modal-livre").focus();
+        return erro(p.livreErroValor);
+      }
       if (nome.length < 2) {
         $("confirmar-nome").focus();
         return erro(p.confirmarErroNome);
@@ -694,15 +750,16 @@
       botao.disabled = true;
       botao.textContent = p.confirmarBotaoEnviando;
 
-      var item = itemAtual;
+      var item = itemAtual;          // null quando é contribuição livre
       var valor = valorEscolhido;
 
       registrarMarcacao(item, valor, nome)
         .then(function () {
-          marcarLocalmente(chaveDoItem(item), valor);
           $("confirmar-formulario").hidden = true;
           $("confirmar-obrigado").hidden = false;
-          // Atualiza a lista para o item já aparecer reservado.
+          // Contribuição livre não reserva item nenhum: não há lista a mudar.
+          if (!item) return;
+          marcarLocalmente(chaveDoItem(item), valor);
           return atualizarListaDePresentes(item, valor);
         })
         .catch(function () {
@@ -720,7 +777,8 @@
       return sbFetch("/rest/v1/marcacoes", {
         metodo: "POST",
         prefer: "return=minimal",
-        corpo: { presente_id: item.id, nome: nome, valor: valor },
+        // Sem item: é uma contribuição de valor livre, que não reserva nada.
+        corpo: { presente_id: item ? item.id : null, nome: nome, valor: valor },
       }).then(function (r) {
         if (!r.ok) throw new Error("HTTP " + r.status);
       });
@@ -728,7 +786,7 @@
     // Sem banco: avisa o casal pela planilha, se estiver configurada.
     return enviarParaPlanilha({
       tipo: "presente",
-      presente: item.nome,
+      presente: item ? item.nome : SITE.presentes.livreNomeNoModal,
       valor: valor,
       nome: nome,
     });
@@ -753,16 +811,16 @@
       if (!$("modal-presente").hidden && ev.key === "Escape") fecharModal();
     });
 
+    // Contribuição livre: o PIX se refaz conforme a pessoa digita.
     $("modal-livre").addEventListener("input", function () {
       var v = parseFloat(this.value.replace(/\./g, "").replace(",", "."));
-      if (!isNaN(v) && v > 0) {
-        valorEscolhido = v;
-        $("modal-opcoes").querySelectorAll(".modal__opcao").forEach(function (x) {
-          x.classList.remove("is-ativa");
-        });
-        atualizarPix();
-      }
+      valorEscolhido = (!isNaN(v) && v > 0) ? v : 0;
+      $("confirmar-erro").hidden = true;
+      atualizarPix();
     });
+
+    // Abre a janela de contribuição com valor à escolha.
+    $("livre-abrir").addEventListener("click", abrirModalLivre);
 
     var tempo = null;
     $("pix-copiar").addEventListener("click", function () {

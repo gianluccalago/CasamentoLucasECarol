@@ -246,6 +246,14 @@
         <p class="assinatura assinatura--centro reveal" id="presentes-subtitulo" aria-hidden="true"></p>
         <p class="section__intro reveal" id="presentes-texto"></p>
         <div class="presentes__grid" id="presentes-grid"></div>
+
+        <!-- Para quem prefere contribuir com um valor à escolha -->
+        <div class="livre reveal">
+          <svg class="livre__flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+          <h3 class="livre__titulo" id="livre-titulo"></h3>
+          <p class="livre__nota" id="livre-nota"></p>
+          <button class="botao botao--outline" id="livre-abrir" type="button"></button>
+        </div>
       </div>
     </section>
 
@@ -308,10 +316,18 @@
       <p class="modal__valor" id="modal-valor"></p>
 
       <p class="modal__rotulo" id="modal-rotulo-escolha"></p>
+
+      <!-- Presente da lista: valores prontos para escolher -->
       <div class="modal__opcoes" id="modal-opcoes"></div>
-      <div class="campo campo--valor">
+
+      <!-- Contribuição livre: a pessoa digita quanto quer dar -->
+      <div class="campo campo--valor" id="modal-campo-livre" hidden>
         <label class="campo__rotulo" for="modal-livre" id="modal-rotulo-livre"></label>
-        <input class="campo__input" id="modal-livre" type="text" inputmode="decimal" autocomplete="off">
+        <div class="campo__moeda">
+          <span aria-hidden="true">R$</span>
+          <input class="campo__input" id="modal-livre" type="text" inputmode="decimal"
+                 autocomplete="off" placeholder="0,00">
+        </div>
       </div>
 
       <!-- ================= PIX — forma principal, sem taxa ================= -->

@@ -36,7 +36,9 @@ create table if not exists public.presentes (
 -- --------------------------------------------------------------------------
 create table if not exists public.marcacoes (
   id           uuid primary key default gen_random_uuid(),
-  presente_id  text not null references public.presentes(id) on delete cascade,
+  -- Fica vazio quando é uma contribuição de valor livre, que não
+  -- reserva nenhum item da lista.
+  presente_id  text references public.presentes(id) on delete cascade,
   nome         text not null,
   valor        numeric(10,2) not null check (valor > 0),
   mensagem     text,
@@ -44,6 +46,9 @@ create table if not exists public.marcacoes (
 );
 
 create index if not exists idx_marcacoes_presente on public.marcacoes(presente_id);
+
+-- Se a tabela já existia com presente_id obrigatório, libera o campo.
+alter table public.marcacoes alter column presente_id drop not null;
 
 -- --------------------------------------------------------------------------
 -- 3. RSVPS — confirmações de presença.
@@ -68,6 +73,11 @@ as $$
 declare
   alvo text := coalesce(new.presente_id, old.presente_id);
 begin
+  -- Contribuição livre não pertence a nenhum presente: nada a recalcular.
+  if alvo is null then
+    return null;
+  end if;
+
   update public.presentes p
      set recebido = coalesce((
            select sum(m.valor) from public.marcacoes m where m.presente_id = alvo
@@ -107,6 +117,8 @@ create policy "marcacoes: qualquer um avisa"
     and valor > 0 and valor <= 100000
     and length(coalesce(mensagem, '')) <= 500
   );
+-- Obs.: presente_id vazio é permitido de propósito — é assim que fica
+-- registrada a contribuição de valor livre.
 
 -- RSVP: o convidado insere a própria confirmação, sem ler a lista.
 drop policy if exists "rsvp: qualquer um confirma" on public.rsvps;
@@ -137,6 +149,7 @@ on conflict (id) do nothing;
 -- COMO VOCÊS ACOMPANHAM (no Table Editor do Supabase)
 -- --------------------------------------------------------------------------
 -- · marcacoes  → quem avisou que presenteou, com valor e data
+--                (linhas sem presente são contribuições de valor livre)
 -- · presentes  → coluna "recebido" mostra o total de cada item
 -- · rsvps      → quem confirmou presença
 --

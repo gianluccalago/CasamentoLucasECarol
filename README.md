@@ -63,6 +63,12 @@ o Supabase (10 minutos, sem pagamento nem token envolvido) — veja
 **[SUPABASE.md](SUPABASE.md)**. Sem ele, a marcação vale só no navegador de
 quem clicou: quem presenteou não vê o item de novo, mas os outros sim.
 
+No fim da lista há um bloco **"Quero contribuir com outro valor"**, para
+quem prefere dar uma quantia à escolha sem pegar um item específico. Essa
+contribuição gera o PIX normalmente e fica registrada, mas não reserva
+nenhum presente — no painel do Supabase ela aparece em `marcacoes` sem
+presente vinculado.
+
 Vocês também podem ajustar o campo `recebido` de qualquer item à mão, no
 `config.js` ou no painel do Supabase.
 

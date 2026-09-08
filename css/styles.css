@@ -724,6 +724,37 @@ body.travado { overflow: hidden; }
 
 .presente__selo svg { width: 15px; height: 15px; }
 
+/* Bloco no fim da lista: contribuição com valor à escolha */
+.livre {
+  margin-top: clamp(32px, 5vw, 52px);
+  padding: clamp(28px, 5vw, 44px) clamp(20px, 4vw, 40px);
+  background: var(--paper-elevated);
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius-card);
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.livre__flor { width: 34px; height: 34px; color: var(--orange); }
+
+.livre__titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(24px, 3vw, 30px);
+  line-height: 1.2;
+}
+
+.livre__nota {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--ink-soft);
+}
+
+.livre .botao { margin-top: 6px; }
+
 /* ==========================================================================
    JANELA DE PRESENTE
    ========================================================================== */
@@ -963,6 +994,26 @@ body.travado { overflow: hidden; }
 }
 
 #confirmar-formulario { display: grid; gap: 14px; text-align: left; }
+
+/* Campo de valor livre, com o "R$" fixo à esquerda */
+.campo__moeda {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  border-bottom: 1px solid var(--gold);
+}
+
+.campo__moeda span {
+  font-family: var(--font-micro);
+  font-size: 20px;
+  color: var(--ink-soft);
+}
+
+.campo__moeda .campo__input {
+  border-bottom: 0;
+  padding-left: 0;
+  font-size: 26px;
+}
 
 #confirmar-obrigado {
   display: grid;

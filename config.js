@@ -195,7 +195,14 @@ const SITE = {
     rotuloContribuir: "Presentear",
     rotuloValorTotal: "Valor total",
     rotuloEscolhaValor: "Quanto você quer contribuir?",
-    rotuloValorLivre: "Outro valor",
+
+    /* --- Bloco no fim da lista: contribuição com valor à escolha ----- */
+    livreTitulo: "Quero contribuir com outro valor",
+    livreNota: "Se preferir, contribua com a quantia que fizer sentido para você — sem escolher um item da lista.",
+    livreBotao: "Escolher o valor",
+    livreNomeNoModal: "Contribuição livre",
+    rotuloValorLivre: "Quanto você quer contribuir?",
+    livreErroValor: "Digite um valor a partir de R$ 5,00.",
 
     /* --- Textos do PIX ---------------------------------------------- */
     pixTitulo: "Pagar com PIX",
@@ -216,6 +223,9 @@ const SITE = {
        marcação vale só no navegador de quem clicou.)
        ---------------------------------------------------------------- */
     confirmarOu: "depois de pagar",
+    // Usados quando a contribuição é de valor livre (sem item da lista).
+    confirmarTituloLivre: "Avise que você contribuiu",
+    confirmarNotaLivre: "Assim sabemos de quem veio esse carinho e podemos agradecer.",
     confirmarTitulo: "Avise que este presente é seu",
     confirmarNota: "Assim ele sai da lista e ninguém repete o mesmo presente. Se você contribuiu com parte do valor, registramos a sua parte — outra pessoa pode completar depois.",
     confirmarRotuloNome: "Seu nome",
