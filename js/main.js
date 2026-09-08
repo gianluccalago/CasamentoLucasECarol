@@ -205,12 +205,17 @@
       desistiu = true;
       capa.src = posterFinal;
       stage.classList.add("is-final");
-      if (video.parentNode) video.parentNode.removeChild(video);
+      // Deixa o vídeo sumir junto com a transição antes de removê-lo.
+      try { video.pause(); } catch (e) { /* indiferente */ }
+      setTimeout(function () {
+        if (video.parentNode) video.parentNode.removeChild(video);
+      }, 600);
     }
 
     var tentativas = 0;
+    var comecou = false;
     function tentarTocar() {
-      if (desistiu || !video.parentNode) return;
+      if (desistiu || comecou || !video.parentNode) return;
       var p = video.play();
       if (p && p.catch) {
         p.catch(function () {
@@ -225,9 +230,47 @@
       }
     }
 
-    video.addEventListener("loadeddata", tentarTocar);
-    video.addEventListener("canplay", tentarTocar);
-    tentarTocar();
+    /* Só começa quando houver fôlego de rede para ir até o fim sem
+       engasgar. Em conexão lenta, um vídeo que trava e volta atrás fica
+       pior do que a ilustração parada — por isso esperamos o buffer. */
+    video.addEventListener("canplaythrough", tentarTocar, { once: true });
+    // Rede boa: canplaythrough chega rápido. Rede mediana: seguimos assim
+    // que houver metade do clipe carregada, ou após 4s de espera.
+    var vigiaBuffer = setInterval(function () {
+      if (desistiu || comecou) { clearInterval(vigiaBuffer); return; }
+      if (video.buffered.length && video.duration) {
+        var carregado = video.buffered.end(video.buffered.length - 1);
+        if (carregado >= video.duration * 0.55) tentarTocar();
+      }
+    }, 250);
+    setTimeout(function () { if (!comecou) tentarTocar(); }, 4000);
+
+    video.addEventListener("playing", function () {
+      comecou = true;
+      clearInterval(vigiaBuffer);
+    });
+
+    /* Rede insuficiente no meio da reprodução: em vez de deixar o vídeo
+       engasgando (e, no iPhone, voltando ao início), assumimos a
+       ilustração pronta com uma transição suave. */
+    var travadoDesde = 0;
+    var ultimoTempo = 0;
+    video.addEventListener("waiting", function () {
+      travadoDesde = travadoDesde || Date.now();
+      setTimeout(function () {
+        if (!desistiu && travadoDesde && Date.now() - travadoDesde >= 2500 &&
+            !stage.classList.contains("is-final")) {
+          mostrarPronta();
+        }
+      }, 2600);
+    });
+    video.addEventListener("timeupdate", function () {
+      travadoDesde = 0;
+      // Se o vídeo regredir sozinho (sintoma de reinício por falta de
+      // buffer), encerramos na ilustração pronta em vez de recomeçar.
+      if (video.currentTime + 0.4 < ultimoTempo) mostrarPronta();
+      ultimoTempo = video.currentTime;
+    });
 
     video.addEventListener("error", function () {
       // Abortos transitórios acontecem com arquivos grandes; só desiste
