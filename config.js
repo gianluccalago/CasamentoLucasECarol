@@ -88,10 +88,10 @@ const SITE = {
       "Mal podemos esperar para celebrar com vocês!",
     ],
     /* FOTO DO PRÉ-WEDDING desta seção.
-       Troque pelo caminho da foto real, ex.: "assets/img/fotos/pre-01.jpg"
-       (proporção vertical 4:5 fica ideal). */
-    foto: "assets/img/placeholders/pre-01.svg",
-    fotoAlt: "Maria Carolina e Lucas no ensaio de pré-wedding",
+       Para trocar, coloque o arquivo em assets/img/fotos/ e escreva o
+       caminho aqui (proporção vertical 4:5 fica ideal). */
+    foto: "assets/img/fotos/casal-flores.jpg",
+    fotoAlt: "Maria Carolina e Lucas se olhando entre galhos floridos",
   },
 
   /* ------------------------------------------------------------------
@@ -105,11 +105,11 @@ const SITE = {
     rotuloHorario: "Horário",
     rotuloLocal: "Espaço",
     botaoMapa: "Ver no mapa",
-    /* FOTOS DO PRÉ-WEDDING desta seção (faixa horizontal, 2 fotos).
-       Proporção 3:2 (horizontal) fica ideal. */
+    /* FOTOS DO PRÉ-WEDDING desta seção (duas, lado a lado).
+       Proporção vertical 4:5 fica ideal. */
     fotos: [
-      { arquivo: "assets/img/placeholders/pre-02.svg", alt: "Maria Carolina e Lucas no ensaio de pré-wedding" },
-      { arquivo: "assets/img/placeholders/pre-03.svg", alt: "Maria Carolina e Lucas no ensaio de pré-wedding" },
+      { arquivo: "assets/img/fotos/casal-caminho.jpg", alt: "Maria Carolina e Lucas caminhando juntos pelo campo" },
+      { arquivo: "assets/img/fotos/casal-por-do-sol.jpg", alt: "Maria Carolina e Lucas ao pôr do sol, entre flores" },
     ],
   },
 

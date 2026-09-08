@@ -16,16 +16,23 @@ de fotos) vive em **um único arquivo**: [`config.js`](config.js). Cada campo
 tem um comentário explicando o que faz. Nada precisa ser mexido no HTML, CSS
 ou `main.js`.
 
-### Colocar as fotos do pré-wedding
+### As fotos do pré-wedding
 
-Os espaços já estão prontos, com imagens de exemplo. Coloque as fotos em
-`assets/img/` e troque os caminhos no `config.js`:
+As três fotos do ensaio já estão no site, em `assets/img/fotos/`:
 
-| Onde aparece | Campo no `config.js` | Proporção ideal |
+| Onde aparece | Arquivo | Campo no `config.js` |
 |---|---|---|
-| Seção "Nosso grande dia" | `boasVindas.foto` | vertical 4:5 |
-| Seção "O grande dia" (duas fotos) | `oDia.fotos` | horizontal 3:2 |
-| Cada presente | `presentes.itens[].foto` | quadrada 1:1 |
+| "Nosso grande dia" | `casal-flores.jpg` | `boasVindas.foto` |
+| "O grande dia" (esquerda) | `casal-caminho.jpg` | `oDia.fotos[0]` |
+| "O grande dia" (direita) | `casal-por-do-sol.jpg` | `oDia.fotos[1]` |
+
+Todas em recorte vertical 4:5, exportadas sem redução de resolução
+(1066×1332, JPEG qualidade 95 sem subamostragem de cor). Para trocar
+qualquer uma, coloque o arquivo em `assets/img/fotos/` e escreva o caminho
+no campo correspondente.
+
+As **fotos dos presentes** (`presentes.itens[].foto`) ainda usam ilustrações
+de exemplo — troque por fotos quadradas (1:1) dos itens.
 
 ### Lista de presentes e o selo "Conquistado!"
 
