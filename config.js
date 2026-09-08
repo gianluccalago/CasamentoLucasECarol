@@ -196,10 +196,8 @@ const SITE = {
     rotuloValorTotal: "Valor total",
     rotuloEscolhaValor: "Quanto você quer contribuir?",
     rotuloValorLivre: "Outro valor",
-    rotuloAvisar: "Avisar que presenteei",
-    rotuloAvisarEnviado: "Obrigado! Anotamos com carinho.",
 
-    /* --- Textos da forma principal: PIX ----------------------------- */
+    /* --- Textos do PIX ---------------------------------------------- */
     pixTitulo: "Pagar com PIX",
     pixNota: "Abra o app do seu banco, escaneie o código e pronto. O valor já vai preenchido.",
     pixRotuloCodigo: "Ou copie o código PIX:",
@@ -207,20 +205,25 @@ const SITE = {
     pixCopiado: "Código copiado!",
     pixRotuloTitular: "Recebedor",
     pixRotuloChave: "Chave PIX",
+    // Lembrete de que dá para parcelar sem sair do banco.
+    pixParcelar: "Quer dividir em vezes? A maioria dos bancos permite parcelar o PIX no próprio aplicativo, na hora do pagamento.",
 
-    /* --- Textos da alternativa: cartão parcelado --------------------
-       Esta opção só aparece se o Supabase estiver configurado
-       (veja SUPABASE.md). Serve para quem prefere parcelar no cartão.
-       Ajuste o aviso da taxa conforme as condições da sua conta no
-       Mercado Pago — as taxas mudam e são negociadas por conta.
+    /* --- Confirmação: é o que reserva o presente --------------------
+       Depois de pagar, o convidado escreve o nome e confirma. Aí o item
+       passa a aparecer como conquistado para TODO MUNDO, evitando que
+       duas pessoas deem o mesmo presente.
+       (Isso exige o Supabase configurado — veja SUPABASE.md. Sem ele, a
+       marcação vale só no navegador de quem clicou.)
        ---------------------------------------------------------------- */
-    cartaoOu: "ou",
-    cartaoTitulo: "Prefere parcelar no cartão?",
-    cartaoNota: "O pagamento é feito pelo Mercado Pago, que permite parcelar. Nesse caso há taxa da operadora sobre o valor — no PIX acima, não há nenhuma.",
-    cartaoRotuloNome: "Seu nome",
-    cartaoRotuloEmail: "Seu e-mail",
-    cartaoBotao: "Ir para o pagamento",
-    cartaoBotaoIndo: "Abrindo…",
+    confirmarOu: "depois de pagar",
+    confirmarTitulo: "Avise que este presente é seu",
+    confirmarNota: "Assim ele sai da lista e ninguém repete o mesmo presente. Leva um segundo.",
+    confirmarRotuloNome: "Seu nome",
+    confirmarBotao: "Já fiz o PIX deste presente",
+    confirmarBotaoEnviando: "Registrando…",
+    confirmarObrigado: "Presente reservado. Obrigado de coração!",
+    confirmarErroNome: "Escreva seu nome para registrarmos o presente.",
+    confirmarErroEnvio: "Não consegui registrar agora. Tente de novo em instantes.",
   },
 
   /* ------------------------------------------------------------------

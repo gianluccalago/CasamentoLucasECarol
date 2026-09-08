@@ -24,9 +24,10 @@
      SUPABASE (opcional)
      ------------------------------------------------------------------
      O PIX funciona sempre, sem servidor nenhum. O Supabase é opcional e
-     serve para duas coisas: guardar a lista de presentes no banco e
-     oferecer o pagamento parcelado no cartão. Sem ele, o site funciona
-     com a lista escrita no config.js. Passo a passo: SUPABASE.md
+     serve para um objetivo só: fazer o presente já escolhido sumir da
+     lista para TODOS os convidados, evitando presentes repetidos. Sem
+     ele, o site usa a lista do config.js e a marcação vale apenas no
+     navegador de quem clicou. Passo a passo: SUPABASE.md
      ------------------------------------------------------------------ */
   var SB = (SITE.supabase && SITE.supabase.url && SITE.supabase.anonKey)
     ? { url: SITE.supabase.url.replace(/\/+$/, ""), chave: SITE.supabase.anonKey }
@@ -432,6 +433,11 @@
   function estadoItem(item) {
     var alvo = item.valor * (item.unidades || 1);
     var recebido = Math.max(0, Number(item.recebido) || 0);
+    // Sem banco compartilhado, a marcação vale só neste navegador — pelo
+    // menos quem presenteou não vê o próprio presente disponível de novo.
+    if (!SB) {
+      recebido += Number(marcadosLocalmente()[chaveDoItem(item)] || 0);
+    }
     return {
       alvo: alvo,
       recebido: Math.min(recebido, alvo),
@@ -545,22 +551,19 @@
     $("pix-titular").textContent = p.titular;
     $("pix-rot-chave").textContent = p.pixRotuloChave;
     $("pix-chave").textContent = p.chavePix;
-    $("modal-avisar").textContent = p.rotuloAvisar;
-    $("modal-avisar").disabled = false;
+    $("pix-parcelar").textContent = p.pixParcelar;
 
-    // --- Cartão parcelado (alternativa; exige o Supabase configurado)
-    var temCartao = !!SB;
-    $("pagar-cartao").hidden = !temCartao;
-    if (temCartao) {
-      $("cartao-ou").textContent = p.cartaoOu;
-      $("cartao-titulo").textContent = p.cartaoTitulo;
-      $("cartao-nota").textContent = p.cartaoNota;
-      $("cartao-rot-nome").textContent = p.cartaoRotuloNome;
-      $("cartao-rot-email").textContent = p.cartaoRotuloEmail;
-      $("cartao-ir").textContent = p.cartaoBotao;
-      $("cartao-ir").disabled = false;
-      $("cartao-erro").hidden = true;
-    }
+    // --- Confirmação: é o que reserva o presente para os demais
+    $("confirmar-ou").textContent = p.confirmarOu;
+    $("confirmar-titulo").textContent = p.confirmarTitulo;
+    $("confirmar-nota").textContent = p.confirmarNota;
+    $("confirmar-rot-nome").textContent = p.confirmarRotuloNome;
+    $("confirmar-enviar").textContent = p.confirmarBotao;
+    $("confirmar-enviar").disabled = false;
+    $("confirmar-erro").hidden = true;
+    $("confirmar-formulario").hidden = false;
+    $("confirmar-obrigado").hidden = true;
+    $("confirmar-obrigado-texto").textContent = p.confirmarObrigado;
 
     // Sugestões: metade, o que falta e o valor cheio de uma unidade
     var falta = Math.max(0, e.alvo - e.recebido);
@@ -619,91 +622,113 @@
     $("modal-presente").hidden = true;
     document.body.classList.remove("travado");
     itemAtual = null;
-    pararDeAcompanhar();
   }
 
   /* ------------------------------------------------------------------
-     PIX pelo Mercado Pago (só quando o Supabase está configurado)
+     RESERVA DO PRESENTE
+     ------------------------------------------------------------------
+     Depois de fazer o PIX, o convidado escreve o nome e confirma. A
+     marcação é somada ao presente e, quando o total é alcançado, o item
+     aparece como conquistado para todos os convidados — que é o que
+     evita duas pessoas darem o mesmo presente.
+
+     Isso só vale para todo mundo se o Supabase estiver configurado
+     (é ele que guarda o dado compartilhado). Sem ele, a marcação fica
+     apenas no navegador de quem clicou, e o casal recebe o aviso pela
+     planilha do Google, se estiver configurada.
      ------------------------------------------------------------------ */
-  var acompanhando = null;
 
-  function pararDeAcompanhar() {
-    if (acompanhando) { clearInterval(acompanhando); acompanhando = null; }
+  var CHAVE_LOCAL = "presentes-marcados";
+
+  function marcadosLocalmente() {
+    try { return JSON.parse(localStorage.getItem(CHAVE_LOCAL) || "{}"); }
+    catch (e) { return {}; }
   }
 
-  /* Depois de gerar o PIX, verifica de tempos em tempos se o presente já
-     foi creditado. Quem confirma o pagamento é o Mercado Pago, avisando o
-     nosso servidor; aqui só observamos o total subir. */
-  function acompanharPagamento(presenteId, recebidoAntes) {
-    pararDeAcompanhar();
-    var tentativas = 0;
-    acompanhando = setInterval(function () {
-      tentativas++;
-      if (tentativas > 100) return pararDeAcompanhar(); // ~5 minutos
-      sbFetch("/rest/v1/presentes?select=recebido&id=eq." + encodeURIComponent(presenteId))
-        .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (linhas) {
-          if (!linhas || !linhas.length) return;
-          if (Number(linhas[0].recebido) > recebidoAntes) {
-            pararDeAcompanhar();
-            var aviso = $("mp-status");
-            aviso.textContent = "Pagamento confirmado. Obrigado de coração!";
-            aviso.classList.add("is-pago");
-            carregarPresentesDoBanco().then(montarPresentes);
-          }
-        })
-        .catch(function () { /* silencioso: tenta de novo no próximo ciclo */ });
-    }, 3000);
+  function marcarLocalmente(chave, valor) {
+    try {
+      var atual = marcadosLocalmente();
+      atual[chave] = (Number(atual[chave]) || 0) + Number(valor);
+      localStorage.setItem(CHAVE_LOCAL, JSON.stringify(atual));
+    } catch (e) { /* navegador sem armazenamento: segue sem lembrar */ }
   }
 
-  function montarPagamentoCartao() {
-    if (!SB) return;
+  /* Chave do item: usa o id do banco quando existe; senão, o nome. */
+  function chaveDoItem(item) {
+    return item.id || item.nome;
+  }
+
+  function montarConfirmacao() {
+    var botao = $("confirmar-enviar");
 
     function erro(msg) {
-      var el = $("cartao-erro");
+      var el = $("confirmar-erro");
       el.textContent = msg;
       el.hidden = false;
     }
 
-    $("cartao-ir").addEventListener("click", function () {
+    botao.addEventListener("click", function () {
       if (!itemAtual) return;
-      var nome = $("cartao-nome").value.trim();
-      var email = $("cartao-email").value.trim();
-      $("cartao-erro").hidden = true;
+      var p = SITE.presentes;
+      var nome = $("confirmar-nome").value.trim();
+      $("confirmar-erro").hidden = true;
 
-      if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-        $("cartao-email").focus();
-        return erro("Precisamos de um e-mail válido para o comprovante.");
+      if (nome.length < 2) {
+        $("confirmar-nome").focus();
+        return erro(p.confirmarErroNome);
       }
 
-      var botao = $("cartao-ir");
       botao.disabled = true;
-      botao.textContent = SITE.presentes.cartaoBotaoIndo;
+      botao.textContent = p.confirmarBotaoEnviando;
 
-      fetch(SB.url + "/functions/v1/criar-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + SB.chave },
-        body: JSON.stringify({
-          presenteId: itemAtual.id,
-          valor: valorEscolhido,
-          nome: nome,
-          email: email,
-        }),
-      })
-        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
-        .then(function (res) {
-          if (!res.ok || !res.d.urlPagamento) {
-            throw new Error(res.d && res.d.erro ? res.d.erro : "Não foi possível abrir o pagamento.");
-          }
-          // Leva o convidado ao ambiente seguro do Mercado Pago.
-          window.location.href = res.d.urlPagamento;
+      var item = itemAtual;
+      var valor = valorEscolhido;
+
+      registrarMarcacao(item, valor, nome)
+        .then(function () {
+          marcarLocalmente(chaveDoItem(item), valor);
+          $("confirmar-formulario").hidden = true;
+          $("confirmar-obrigado").hidden = false;
+          // Atualiza a lista para o item já aparecer reservado.
+          return atualizarListaDePresentes(item, valor);
         })
-        .catch(function (e) {
+        .catch(function () {
           botao.disabled = false;
-          botao.textContent = SITE.presentes.cartaoBotao;
-          erro(e.message || "Não foi possível abrir o pagamento agora.");
+          botao.textContent = p.confirmarBotao;
+          erro(p.confirmarErroEnvio);
         });
     });
+  }
+
+  /* Grava a marcação onde for possível: no banco (visível para todos) e,
+     se houver planilha configurada, também como aviso para o casal. */
+  function registrarMarcacao(item, valor, nome) {
+    if (SB) {
+      return sbFetch("/rest/v1/marcacoes", {
+        metodo: "POST",
+        prefer: "return=minimal",
+        corpo: { presente_id: item.id, nome: nome, valor: valor },
+      }).then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+      });
+    }
+    // Sem banco: avisa o casal pela planilha, se estiver configurada.
+    return enviarParaPlanilha({
+      tipo: "presente",
+      presente: item.nome,
+      valor: valor,
+      nome: nome,
+    });
+  }
+
+  /* Relê os presentes do banco; sem banco, soma na lista em memória. */
+  function atualizarListaDePresentes(item, valor) {
+    if (SB) {
+      return carregarPresentesDoBanco().then(function () { montarPresentes(); });
+    }
+    item.recebido = (Number(item.recebido) || 0) + Number(valor);
+    montarPresentes();
+    return Promise.resolve();
   }
 
   function montarModal() {
@@ -747,19 +772,6 @@
       }
     });
 
-    // Avisa o casal (registra na planilha) que o presente foi pago
-    $("modal-avisar").addEventListener("click", function () {
-      var botao = this;
-      if (!itemAtual) return;
-      botao.disabled = true;
-      enviarParaPlanilha({
-        tipo: "presente",
-        presente: itemAtual.nome,
-        valor: valorEscolhido,
-      }).then(function () {
-        botao.textContent = SITE.presentes.rotuloAvisarEnviado;
-      });
-    });
   }
 
   function copiaManual(texto, aoTerminar) {
@@ -862,7 +874,7 @@
   montarNavegacao();
   montarPresentes();
   montarModal();
-  montarPagamentoCartao();
+  montarConfirmacao();
   montarEntradas();
   montarParallax();
   montarRsvp();

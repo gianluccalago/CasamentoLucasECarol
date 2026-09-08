@@ -34,33 +34,31 @@ no campo correspondente.
 As **fotos dos presentes** (`presentes.itens[].foto`) ainda usam ilustrações
 de exemplo — troque por fotos quadradas (1:1) dos itens.
 
-### Lista de presentes: como o convidado paga
+### Lista de presentes: como funciona
 
 Cada item tem `valor`, `unidades` e `recebido` (quanto já entrou, em reais).
-O convidado escolhe pagar o valor cheio ou uma parte, e tem duas formas:
-
-**1. PIX — principal, sem taxa nenhuma.** O site monta na hora um QR Code
-com o valor já preenchido e o dinheiro cai direto na conta de vocês, sem
-intermediário. Isso funciona sem servidor: o código PIX (padrão BR Code do
-Banco Central) é gerado no próprio navegador.
+O convidado escolhe pagar o valor cheio ou uma parte e paga por **PIX**: o
+site monta na hora um QR Code com o valor já preenchido, e o dinheiro cai
+direto na conta de vocês — sem taxa e sem intermediário. Quem preferir
+dividir em vezes pode parcelar o PIX no próprio aplicativo do banco, o que
+a maioria dos bancos já permite (o site menciona isso).
 
 > Os campos `chavePix`, `titular` e `cidade` no `config.js` são o que vai
 > dentro do QR Code. **Confira com cuidado** — um erro ali manda o dinheiro
 > para a conta errada. Faça um teste de R$ 1,00 antes de divulgar o site.
 
-**2. Cartão parcelado — opcional.** Aparece abaixo do PIX apenas se o
-Supabase estiver configurado. Serve para quem prefere dividir o valor; nesse
-caso o Mercado Pago cobra taxa. Veja **[SUPABASE.md](SUPABASE.md)**.
+**Para não darem o mesmo presente duas vezes:** depois de pagar, o convidado
+escreve o nome e clica em "Já fiz o PIX deste presente". O item passa a
+aparecer como **CONQUISTADO** e some da lista. Itens com mais de uma unidade
+só bloqueiam quando todas forem pagas.
 
-O selo **CONQUISTADO!** aparece quando `recebido` alcança `valor × unidades`
-— ou seja, só depois que **todas** as unidades foram pagas. Antes disso, o
-cartão mostra o progresso. Para atualizar o quanto já foi recebido:
+Para esse bloqueio valer para **todos os convidados**, é preciso configurar
+o Supabase (10 minutos, sem pagamento nem token envolvido) — veja
+**[SUPABASE.md](SUPABASE.md)**. Sem ele, a marcação vale só no navegador de
+quem clicou: quem presenteou não vê o item de novo, mas os outros sim.
 
-- **PIX**: como o dinheiro vai direto para vocês, o site não fica sabendo.
-  Ao ver a entrada no extrato, atualize o campo `recebido` do item (no
-  `config.js` ou, se estiver usando o Supabase, no Table Editor). O nome do
-  presente aparece como identificador no extrato, o que ajuda a reconhecer.
-- **Cartão**: é automático, confirmado pelo Mercado Pago.
+Vocês também podem ajustar o campo `recebido` de qualquer item à mão, no
+`config.js` ou no painel do Supabase.
 
 ### Confirmações de presença (RSVP)
 

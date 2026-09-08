@@ -2,58 +2,48 @@
 -- ESQUEMA DO BANCO — Casamento Maria Carolina & Lucas
 -- ==========================================================================
 -- Cole este arquivo inteiro no SQL Editor do Supabase e clique em RUN.
--- Ele cria as três tabelas, a segurança de acesso e o gatilho que soma
--- automaticamente quanto já foi recebido de cada presente.
+--
+-- Para que serve: guardar a lista de presentes e registrar quem já
+-- presenteou cada item. É isso que faz um presente aparecer como
+-- CONQUISTADO para TODOS os convidados — evitando que duas pessoas
+-- comprem a mesma coisa.
+--
+-- Não há pagamento aqui: o PIX é feito direto do banco do convidado para
+-- a conta de vocês. O site só anota quem avisou que presenteou.
 --
 -- Rodar de novo é seguro: tudo usa "if not exists" / "or replace".
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
--- 1. PRESENTES — o catálogo. É a fonte da verdade dos valores.
---    O site LÊ esta tabela; ninguém consegue escrever nela pelo navegador.
+-- 1. PRESENTES — o catálogo. O site LÊ esta tabela.
 -- --------------------------------------------------------------------------
 create table if not exists public.presentes (
-  id         text primary key,                    -- ex.: "jogo-de-panelas"
+  id         text primary key,                          -- ex.: "jogo-de-panelas"
   nome       text not null,
-  valor      numeric(10,2) not null check (valor > 0),   -- valor de UMA unidade
+  valor      numeric(10,2) not null check (valor > 0),  -- valor de UMA unidade
   unidades   int  not null default 1 check (unidades > 0),
   foto       text,
   ordem      int  not null default 0,
   ativo      boolean not null default true,
-  -- Somado automaticamente pelo gatilho, a partir dos pagamentos aprovados.
+  -- Somado automaticamente a partir das marcações (não edite na mão).
   recebido   numeric(10,2) not null default 0
 );
 
 -- --------------------------------------------------------------------------
--- 2. CONTRIBUIÇÕES — cada tentativa de presente e seu pagamento.
---    Tabela privada: o navegador não lê nem escreve aqui. Só as funções
---    do servidor (que usam a chave secreta) mexem nela.
+-- 2. MARCAÇÕES — cada convidado que avisou "já fiz o PIX deste presente".
+--    O convidado só consegue INSERIR aqui. Não consegue ler a lista de
+--    quem presenteou, nem apagar nada.
 -- --------------------------------------------------------------------------
-create table if not exists public.contribuicoes (
-  id                uuid primary key default gen_random_uuid(),
-  presente_id       text not null references public.presentes(id) on delete cascade,
-  valor             numeric(10,2) not null check (valor > 0),
-  nome              text,
-  email             text,
-  mensagem          text,
-  -- 'pix'    = PIX direto na conta do casal (sem taxa, confirmação de vocês)
-  -- 'cartao' = cartão parcelado pelo Mercado Pago (confirmação automática)
-  forma             text not null default 'cartao' check (forma in ('pix','cartao')),
-  mp_payment_id     text unique,                  -- id do pagamento no Mercado Pago
-  mp_preference_id  text,                         -- id da preferência de checkout
-  status            text not null default 'pendente'
-                    check (status in ('pendente','aprovado','recusado','expirado')),
-  criado_em         timestamptz not null default now(),
-  pago_em           timestamptz
+create table if not exists public.marcacoes (
+  id           uuid primary key default gen_random_uuid(),
+  presente_id  text not null references public.presentes(id) on delete cascade,
+  nome         text not null,
+  valor        numeric(10,2) not null check (valor > 0),
+  mensagem     text,
+  criado_em    timestamptz not null default now()
 );
 
--- Se a tabela já existia de uma versão anterior, acrescenta as colunas novas.
-alter table public.contribuicoes
-  add column if not exists forma text not null default 'cartao',
-  add column if not exists mp_preference_id text;
-
-create index if not exists idx_contribuicoes_presente on public.contribuicoes(presente_id);
-create index if not exists idx_contribuicoes_status   on public.contribuicoes(status);
+create index if not exists idx_marcacoes_presente on public.marcacoes(presente_id);
 
 -- --------------------------------------------------------------------------
 -- 3. RSVPS — confirmações de presença.
@@ -66,8 +56,8 @@ create table if not exists public.rsvps (
 );
 
 -- --------------------------------------------------------------------------
--- 4. GATILHO: mantém presentes.recebido sempre igual à soma dos
---    pagamentos APROVADOS daquele presente.
+-- 4. GATILHO: soma as marcações no total recebido de cada presente.
+--    É esse total que faz o selo CONQUISTADO aparecer.
 -- --------------------------------------------------------------------------
 create or replace function public.atualizar_recebido()
 returns trigger
@@ -80,25 +70,24 @@ declare
 begin
   update public.presentes p
      set recebido = coalesce((
-           select sum(c.valor) from public.contribuicoes c
-            where c.presente_id = alvo and c.status = 'aprovado'
+           select sum(m.valor) from public.marcacoes m where m.presente_id = alvo
          ), 0)
    where p.id = alvo;
   return null;
 end;
 $$;
 
-drop trigger if exists trg_atualizar_recebido on public.contribuicoes;
+drop trigger if exists trg_atualizar_recebido on public.marcacoes;
 create trigger trg_atualizar_recebido
-after insert or update or delete on public.contribuicoes
+after insert or update or delete on public.marcacoes
 for each row execute function public.atualizar_recebido();
 
 -- --------------------------------------------------------------------------
--- 5. SEGURANÇA (RLS) — quem pode fazer o quê pelo navegador
+-- 5. SEGURANÇA (RLS) — o que o navegador do convidado pode fazer
 -- --------------------------------------------------------------------------
-alter table public.presentes     enable row level security;
-alter table public.contribuicoes enable row level security;
-alter table public.rsvps         enable row level security;
+alter table public.presentes enable row level security;
+alter table public.marcacoes enable row level security;
+alter table public.rsvps     enable row level security;
 
 -- Presentes: qualquer visitante LÊ (para montar a lista). Ninguém escreve.
 drop policy if exists "presentes: leitura publica" on public.presentes;
@@ -107,12 +96,19 @@ create policy "presentes: leitura publica"
   to anon, authenticated
   using (ativo);
 
--- Contribuições: NENHUMA política para o navegador.
--- Sem política, o RLS bloqueia tudo — só as funções do servidor acessam.
--- É isso que impede alguém de marcar um presente como pago sem pagar.
+-- Marcações: o convidado só INSERE a própria (com nome e valor válidos).
+-- Não pode ler nem apagar as dos outros.
+drop policy if exists "marcacoes: qualquer um avisa" on public.marcacoes;
+create policy "marcacoes: qualquer um avisa"
+  on public.marcacoes for insert
+  to anon, authenticated
+  with check (
+    length(trim(nome)) between 2 and 120
+    and valor > 0 and valor <= 100000
+    and length(coalesce(mensagem, '')) <= 500
+  );
 
--- RSVP: o visitante pode INSERIR a própria confirmação, mas não pode
--- ler a lista de convidados.
+-- RSVP: o convidado insere a própria confirmação, sem ler a lista.
 drop policy if exists "rsvp: qualquer um confirma" on public.rsvps;
 create policy "rsvp: qualquer um confirma"
   on public.rsvps for insert
@@ -123,8 +119,8 @@ create policy "rsvp: qualquer um confirma"
   );
 
 -- --------------------------------------------------------------------------
--- 6. CATÁLOGO INICIAL — edite valores, nomes e unidades à vontade.
---    Para alterar depois, use o Table Editor do Supabase.
+-- 6. CATÁLOGO INICIAL — edite valores, nomes e unidades à vontade,
+--    aqui ou depois pelo Table Editor.
 -- --------------------------------------------------------------------------
 insert into public.presentes (id, nome, valor, unidades, foto, ordem) values
   ('jogo-de-panelas',    'Jogo de panelas',    890, 1, 'assets/img/placeholders/presente-01.svg', 1),
@@ -136,3 +132,14 @@ insert into public.presentes (id, nome, valor, unidades, foto, ordem) values
   ('aparelho-de-jantar', 'Aparelho de jantar', 980, 1, 'assets/img/placeholders/presente-07.svg', 7),
   ('lua-de-mel',         'Nossa lua de mel',   500, 8, 'assets/img/placeholders/presente-08.svg', 8)
 on conflict (id) do nothing;
+
+-- ==========================================================================
+-- COMO VOCÊS ACOMPANHAM (no Table Editor do Supabase)
+-- --------------------------------------------------------------------------
+-- · marcacoes  → quem avisou que presenteou, com valor e data
+-- · presentes  → coluna "recebido" mostra o total de cada item
+-- · rsvps      → quem confirmou presença
+--
+-- Se alguém marcar por engano, apague a linha em "marcacoes": o total do
+-- presente se corrige sozinho e o item volta a ficar disponível.
+-- ==========================================================================

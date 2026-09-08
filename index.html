@@ -330,26 +330,27 @@
           <div><dt id="pix-rot-chave"></dt><dd class="pagar__chave" id="pix-chave"></dd></div>
         </dl>
 
-        <button class="botao botao--texto" id="modal-avisar" type="button"></button>
+        <p class="pagar__parcelar" id="pix-parcelar"></p>
       </section>
 
-      <!-- ============ CARTÃO — alternativa para quem quer parcelar ========= -->
-      <section class="pagar pagar--secundario" id="pagar-cartao" hidden>
-        <div class="pagar__ou"><span id="cartao-ou"></span></div>
-        <h4 class="pagar__titulo" id="cartao-titulo"></h4>
-        <p class="pagar__nota" id="cartao-nota"></p>
+      <!-- ===== Confirmação: é o que reserva o presente para os demais ===== -->
+      <section class="pagar pagar--secundario" id="confirmar-presente">
+        <div class="pagar__ou"><span id="confirmar-ou"></span></div>
+        <h4 class="pagar__titulo" id="confirmar-titulo"></h4>
+        <p class="pagar__nota" id="confirmar-nota"></p>
 
-        <div id="cartao-formulario">
+        <div id="confirmar-formulario">
           <div class="campo">
-            <label class="campo__rotulo" for="cartao-nome" id="cartao-rot-nome"></label>
-            <input class="campo__input" id="cartao-nome" type="text" autocomplete="name">
+            <label class="campo__rotulo" for="confirmar-nome" id="confirmar-rot-nome"></label>
+            <input class="campo__input" id="confirmar-nome" type="text" autocomplete="name">
           </div>
-          <div class="campo">
-            <label class="campo__rotulo" for="cartao-email" id="cartao-rot-email"></label>
-            <input class="campo__input" id="cartao-email" type="email" autocomplete="email">
-          </div>
-          <p class="modal__erro" id="cartao-erro" hidden></p>
-          <button class="botao botao--outline" id="cartao-ir" type="button"></button>
+          <p class="modal__erro" id="confirmar-erro" hidden></p>
+          <button class="botao botao--outline" id="confirmar-enviar" type="button"></button>
+        </div>
+
+        <div id="confirmar-obrigado" hidden>
+          <svg class="confirmar__flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+          <p class="modal__aviso is-pago" id="confirmar-obrigado-texto"></p>
         </div>
       </section>
     </div>

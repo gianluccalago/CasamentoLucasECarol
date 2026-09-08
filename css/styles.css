@@ -951,7 +951,29 @@ body.travado { overflow: hidden; }
   border-top: 1px dashed var(--hairline);
 }
 
-#cartao-formulario { display: grid; gap: 14px; text-align: left; }
+#confirmar-formulario { display: grid; gap: 14px; text-align: left; }
+
+#confirmar-obrigado {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding-block: 6px;
+}
+
+.confirmar__flor {
+  width: 34px;
+  height: 34px;
+  color: var(--orange);
+}
+
+/* Lembrete de que dá para parcelar o PIX no próprio banco */
+.pagar__parcelar {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  font-style: italic;
+}
 
 .modal__erro {
   margin: 0;
