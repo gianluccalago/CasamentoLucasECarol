@@ -147,6 +147,11 @@ create policy "rsvp: qualquer um confirma"
 --
 --  >>> TROQUE A SENHA NA LINHA INDICADA ANTES DE RODAR ESTE ARQUIVO. <<<
 --
+--  ATENÇÃO: troque a senha AQUI NO EDITOR DO SUPABASE, na hora de colar.
+--  NÃO salve a senha de verdade neste arquivo: o repositório é público,
+--  e o que entra no histórico do git fica lá para sempre. Este arquivo
+--  deve continuar com o texto de exemplo.
+--
 -- Depois é só abrir  https://SEU-SITE/painel.html  e digitar a senha.
 -- --------------------------------------------------------------------------
 create table if not exists public.painel_acesso (
@@ -161,7 +166,7 @@ alter table public.painel_acesso enable row level security;
 revoke all on public.painel_acesso from anon, authenticated;
 
 insert into public.painel_acesso (id, senha)
-values (1, 'braialol')      -- <<<<<< TROQUE AQUI (mínimo 8 letras)
+values (1, 'troque-esta-senha')      -- <<<<<< TROQUE AQUI (mínimo 8 letras)
 on conflict (id) do nothing;
 
 -- Para mudar a senha depois:
