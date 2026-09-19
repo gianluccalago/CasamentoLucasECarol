@@ -47,11 +47,20 @@
     });
   }
 
+  /* A foto de cada presente vem da pasta assets/img/presentes/, pelo id
+     (ex.: "06-liquidificador" → 06-liquidificador.jpg). O item pode
+     trazer um campo "foto" próprio para usar outra imagem. */
+  function fotoDoItem(item) {
+    if (item.foto) return item.foto;
+    var pasta = SITE.presentes.pastaFotos || "assets/img/presentes/";
+    return pasta + item.id + ".jpg";
+  }
+
   /* Traz os presentes do banco para dentro de SITE.presentes.itens, no
      mesmo formato que o resto do site já usa. */
   function carregarPresentesDoBanco() {
     if (!SB) return Promise.resolve(false);
-    return sbFetch("/rest/v1/presentes?select=id,nome,valor,unidades,foto,recebido&ativo=eq.true&order=ordem")
+    return sbFetch("/rest/v1/presentes?select=id,nome,modelo,categoria,valor,unidades,foto,recebido&ativo=eq.true&order=ordem")
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)); })
       .then(function (linhas) {
         if (!Array.isArray(linhas) || !linhas.length) return false;
@@ -59,10 +68,12 @@
           return {
             id: l.id,
             nome: l.nome,
+            modelo: l.modelo || "",
+            categoria: l.categoria || "",
             valor: Number(l.valor),
             unidades: Number(l.unidades) || 1,
             recebido: Number(l.recebido) || 0,
-            foto: l.foto || "assets/img/placeholders/presente-01.svg",
+            foto: l.foto || "",
           };
         });
         return true;
@@ -150,6 +161,7 @@
     var sub = $("presentes-subtitulo");
     if (SITE.presentes.subtitulo) { sub.textContent = SITE.presentes.subtitulo; } else { sub.hidden = true; }
     $("presentes-texto").textContent = SITE.presentes.texto;
+    $("presentes-instrucao").textContent = SITE.presentes.instrucao || "";
     $("livre-titulo").textContent = SITE.presentes.livreTitulo;
     $("livre-nota").textContent = SITE.presentes.livreNota;
     $("livre-abrir").textContent = SITE.presentes.livreBotao;
@@ -461,20 +473,101 @@
     };
   }
 
+  /* Filtro por categoria. São 92 presentes: sem isto a lista vira um
+     rolo infinito. "null" significa "Todos". */
+  var categoriaAtiva = null;
+
+  function categoriasEmUso() {
+    var listadas = SITE.presentes.categorias || [];
+    var presentes = {};
+    SITE.presentes.itens.forEach(function (i) { if (i.categoria) presentes[i.categoria] = true; });
+    // Mantém a ordem escolhida no config e acrescenta o que vier do banco.
+    return listadas.filter(function (c) { return presentes[c]; })
+      .concat(Object.keys(presentes).filter(function (c) { return listadas.indexOf(c) === -1; }));
+  }
+
+  function itensDaCategoria(categoria) {
+    if (!categoria) return SITE.presentes.itens.slice();
+    return SITE.presentes.itens.filter(function (i) { return i.categoria === categoria; });
+  }
+
+  function montarFiltros() {
+    var barra = $("presentes-filtros");
+    var categorias = categoriasEmUso();
+    if (!categorias.length) { barra.hidden = true; return; }
+
+    barra.textContent = "";
+    [null].concat(categorias).forEach(function (categoria) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "filtro";
+      b.dataset.categoria = categoria || "";
+      var rotulo = document.createElement("span");
+      rotulo.textContent = categoria || SITE.presentes.rotuloTodos || "Todos";
+      var conta = document.createElement("span");
+      conta.className = "filtro__conta";
+      b.appendChild(rotulo);
+      b.appendChild(conta);
+      b.addEventListener("click", function () {
+        categoriaAtiva = categoria;
+        montarPresentes();
+        // Mantém o topo da lista à vista ao trocar de categoria.
+        var secao = $("presentes-lista");
+        var y = secao.getBoundingClientRect().top + window.scrollY - 90;
+        window.scrollTo({ top: y, behavior: reduzMovimento ? "auto" : "smooth" });
+      });
+      barra.appendChild(b);
+    });
+  }
+
+  /* Atualiza os números e o estado marcado dos botões de filtro. */
+  function atualizarFiltros() {
+    var botoes = $("presentes-filtros").querySelectorAll(".filtro");
+    Array.prototype.forEach.call(botoes, function (b) {
+      var categoria = b.dataset.categoria || null;
+      var lista = itensDaCategoria(categoria);
+      var livres = lista.filter(function (i) { return !estadoItem(i).conquistado; }).length;
+      b.querySelector(".filtro__conta").textContent = livres;
+      b.classList.toggle("is-ativo", categoria === categoriaAtiva);
+      b.setAttribute("aria-pressed", String(categoria === categoriaAtiva));
+    });
+  }
+
+  function textoResumo(livres, conquistados) {
+    var p = SITE.presentes;
+    var base;
+    if (livres === 0) base = p.resumoNenhum || "";
+    else if (livres === 1) base = p.resumoUm || "1 presente disponível";
+    else base = (p.resumoDisponiveis || "{n} presentes disponíveis").replace("{n}", livres);
+    if (conquistados > 0 && p.resumoConquistados) {
+      base += " · " + p.resumoConquistados.replace("{n}", conquistados);
+    }
+    return base;
+  }
+
   function montarPresentes() {
     var grid = $("presentes-grid");
     grid.textContent = "";
 
-    SITE.presentes.itens.forEach(function (item, i) {
+    var lista = itensDaCategoria(categoriaAtiva);
+    // Os já conquistados continuam à vista, mas descem para o fim da lista.
+    var livres = [], conquistados = [];
+    lista.forEach(function (item) {
+      (estadoItem(item).conquistado ? conquistados : livres).push(item);
+    });
+    $("presentes-resumo").textContent = textoResumo(livres.length, conquistados.length);
+
+    livres.concat(conquistados).forEach(function (item) {
       var e = estadoItem(item);
       var card = document.createElement("article");
       card.className = "presente reveal" + (e.conquistado ? " is-conquistado" : "");
 
       var img = document.createElement("img");
       img.className = "presente__foto";
-      img.src = item.foto;
+      img.src = fotoDoItem(item);
       img.alt = item.nome;
       img.loading = "lazy";
+      img.decoding = "async";
       card.appendChild(img);
 
       if (e.conquistado) {
@@ -496,6 +589,14 @@
       nome.className = "presente__nome";
       nome.textContent = item.nome;
       corpo.appendChild(nome);
+
+      // Sugestão de marca/modelo, em letra menor.
+      if (item.modelo) {
+        var modelo = document.createElement("p");
+        modelo.className = "presente__modelo";
+        modelo.textContent = item.modelo;
+        corpo.appendChild(modelo);
+      }
 
       var valor = document.createElement("p");
       valor.className = "presente__valor";
@@ -529,7 +630,8 @@
         botao.type = "button";
         botao.className = "botao botao--outline";
         botao.textContent = SITE.presentes.rotuloContribuir;
-        botao.addEventListener("click", function () { abrirModal(i); });
+        botao.setAttribute("aria-label", SITE.presentes.rotuloContribuir + ": " + item.nome);
+        botao.addEventListener("click", function () { abrirModal(item); });
         acao.appendChild(botao);
       }
       corpo.appendChild(acao);
@@ -538,6 +640,7 @@
       grid.appendChild(card);
     });
 
+    atualizarFiltros();
     montarEntradas();
   }
 
@@ -584,17 +687,18 @@
   }
 
   /* Um presente da lista */
-  function abrirModal(indice) {
-    var item = SITE.presentes.itens[indice];
+  function abrirModal(item) {
     var e = estadoItem(item);
     var p = SITE.presentes;
     itemAtual = item;
     contribuicaoLivre = false;
 
     $("modal-foto").hidden = false;
-    $("modal-foto").src = item.foto;
+    $("modal-foto").src = fotoDoItem(item);
     $("modal-foto").alt = item.nome;
     $("modal-nome").textContent = item.nome;
+    $("modal-modelo").textContent = item.modelo || "";
+    $("modal-modelo").hidden = !item.modelo;
     $("modal-valor").hidden = false;
     $("modal-valor").textContent = p.rotuloValorTotal + ": " + moeda(item.valor) +
       ((item.unidades || 1) > 1 ? " · " + item.unidades + " un." : "");
@@ -640,6 +744,7 @@
 
     $("modal-foto").hidden = true;
     $("modal-nome").textContent = p.livreNomeNoModal;
+    $("modal-modelo").hidden = true;
     $("modal-valor").hidden = true;
 
     prepararModal(true);
@@ -943,6 +1048,7 @@
   hidratar();
   montarHero();
   montarNavegacao();
+  montarFiltros();
   montarPresentes();
   montarModal();
   montarConfirmacao();
@@ -953,7 +1059,11 @@
   if (SB) {
     // Lista de presentes vinda do banco (com o total já recebido de cada um).
     carregarPresentesDoBanco().then(function (deuCerto) {
-      if (deuCerto) montarPresentes();
+      if (!deuCerto) return;
+      // O banco pode trazer categorias diferentes das do config.js.
+      if (categoriaAtiva && categoriasEmUso().indexOf(categoriaAtiva) === -1) categoriaAtiva = null;
+      montarFiltros();
+      montarPresentes();
     });
   } else {
     // Sem Supabase: mantém a sincronia opcional pela planilha do Google.

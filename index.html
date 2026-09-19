@@ -245,7 +245,14 @@
         <h2 class="section__title section__title--centro reveal" id="presentes-titulo"></h2>
         <p class="assinatura assinatura--centro reveal" id="presentes-subtitulo" aria-hidden="true"></p>
         <p class="section__intro reveal" id="presentes-texto"></p>
-        <div class="presentes__grid" id="presentes-grid"></div>
+        <p class="presentes__instrucao reveal" id="presentes-instrucao"></p>
+
+        <div class="presentes__lista" id="presentes-lista">
+          <div class="presentes__filtros" id="presentes-filtros" role="group"
+               aria-label="Filtrar presentes por categoria"></div>
+          <p class="presentes__resumo" id="presentes-resumo" role="status"></p>
+          <div class="presentes__grid" id="presentes-grid"></div>
+        </div>
 
         <!-- Para quem prefere contribuir com um valor à escolha -->
         <div class="livre reveal">
@@ -313,6 +320,7 @@
       <button class="modal__fechar" id="modal-fechar" aria-label="Fechar">&times;</button>
       <img class="modal__foto" id="modal-foto" alt="">
       <h3 class="modal__nome" id="modal-nome"></h3>
+      <p class="modal__modelo" id="modal-modelo"></p>
       <p class="modal__valor" id="modal-valor"></p>
 
       <p class="modal__rotulo" id="modal-rotulo-escolha"></p>

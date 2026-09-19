@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel dos noivos — Maria Carolina &amp; Lucas</title>
+
+  <!-- Página privada: fora do site, sem link nenhum e fora de buscadores. -->
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+
+  <link rel="preload" href="assets/fonts/eb-garamond.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/painel.css">
+</head>
+<body class="painel">
+
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <defs>
+      <symbol id="svg-flor" viewBox="0 0 48 48">
+        <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(72 24 24)"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(144 24 24)"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(216 24 24)"/>
+          <path d="M24 20.2 C 20.4 17.4 19.6 11.2 21.2 7.6 C 22 5.8 26 5.8 26.8 7.6 C 28.4 11.2 27.6 17.4 24 20.2 Z" transform="rotate(288 24 24)"/>
+          <circle cx="24" cy="24" r="2.4"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+
+  <header class="painel__topo">
+    <svg class="painel__flor" aria-hidden="true"><use href="#svg-flor"/></svg>
+    <h1 class="painel__titulo">Painel dos noivos</h1>
+    <p class="painel__sub" id="painel-sub"></p>
+  </header>
+
+  <main class="painel__corpo">
+
+    <!-- ============================================================
+         ENTRADA — a senha é conferida no banco, não aqui
+         ============================================================ -->
+    <section class="painel__entrada" id="painel-entrada">
+      <h2 class="painel__entrada-titulo">Esta página é só de vocês</h2>
+      <p class="painel__entrada-nota">
+        Aqui aparece quem presenteou o quê e quando, quanto já entrou e quem
+        confirmou presença. Digite a senha combinada para entrar.
+      </p>
+      <form id="painel-form" novalidate>
+        <div class="campo">
+          <label class="campo__rotulo" for="painel-senha">Senha</label>
+          <input class="campo__input" id="painel-senha" type="password"
+                 autocomplete="current-password" required>
+        </div>
+        <p class="painel__erro" id="painel-erro" hidden></p>
+        <button class="botao botao--primario" id="painel-entrar" type="submit">Entrar</button>
+      </form>
+      <p class="painel__ajuda" id="painel-ajuda" hidden></p>
+    </section>
+
+    <!-- ============================================================
+         CONTEÚDO
+         ============================================================ -->
+    <section id="painel-conteudo" hidden>
+
+      <div class="resumo" id="painel-resumo"></div>
+
+      <div class="painel__barra">
+        <div class="painel__abas" id="painel-abas" role="tablist" aria-label="O que mostrar">
+          <button class="aba is-ativa" type="button" role="tab" data-alvo="aba-presentes" aria-selected="true">Quem presenteou</button>
+          <button class="aba" type="button" role="tab" data-alvo="aba-lista" aria-selected="false">A lista</button>
+          <button class="aba" type="button" role="tab" data-alvo="aba-presencas" aria-selected="false">Presenças</button>
+        </div>
+        <div class="painel__acoes">
+          <button class="botao botao--outline botao--mini" id="painel-atualizar" type="button">Atualizar</button>
+          <button class="botao botao--texto botao--mini" id="painel-sair" type="button">Sair</button>
+        </div>
+      </div>
+
+      <p class="painel__atualizado" id="painel-atualizado"></p>
+
+      <!-- ---- Quem presenteou o quê e quando ---- -->
+      <div class="aba-painel" id="aba-presentes" role="tabpanel">
+        <div class="painel__ferramentas">
+          <input class="campo__input painel__busca" id="painel-busca" type="search"
+                 placeholder="Procurar por nome ou presente…" aria-label="Procurar">
+          <button class="botao botao--outline botao--mini" id="baixar-presentes" type="button">Baixar planilha</button>
+        </div>
+        <div class="tabela-rolo">
+          <table class="tabela" id="tabela-marcacoes">
+            <thead>
+              <tr><th scope="col">Quando</th><th scope="col">Quem presenteou</th><th scope="col">Presente</th><th scope="col" class="num">Valor</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="painel__vazio" id="vazio-marcacoes" hidden>Nenhum presente registrado até agora.</p>
+      </div>
+
+      <!-- ---- A lista inteira, com o que falta ---- -->
+      <div class="aba-painel" id="aba-lista" role="tabpanel" hidden>
+        <div class="painel__ferramentas">
+          <div class="painel__filtro-situacao" id="filtro-situacao" role="group" aria-label="Filtrar a lista">
+            <button class="filtro is-ativo" type="button" data-situacao="todos" aria-pressed="true"><span>Todos</span></button>
+            <button class="filtro" type="button" data-situacao="disponiveis" aria-pressed="false"><span>Disponíveis</span></button>
+            <button class="filtro" type="button" data-situacao="conquistados" aria-pressed="false"><span>Conquistados</span></button>
+          </div>
+          <button class="botao botao--outline botao--mini" id="baixar-lista" type="button">Baixar planilha</button>
+        </div>
+        <div class="tabela-rolo">
+          <table class="tabela" id="tabela-lista">
+            <thead>
+              <tr><th scope="col">Presente</th><th scope="col">Categoria</th><th scope="col" class="num">Valor</th><th scope="col" class="num">Recebido</th><th scope="col">Situação</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ---- Confirmações de presença ---- -->
+      <div class="aba-painel" id="aba-presencas" role="tabpanel" hidden>
+        <div class="painel__ferramentas">
+          <span class="painel__conta" id="conta-rsvps"></span>
+          <button class="botao botao--outline botao--mini" id="baixar-rsvps" type="button">Baixar planilha</button>
+        </div>
+        <div class="tabela-rolo">
+          <table class="tabela" id="tabela-rsvps">
+            <thead>
+              <tr><th scope="col">Quando</th><th scope="col">Nome</th><th scope="col">Observações</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="painel__vazio" id="vazio-rsvps" hidden>Ninguém confirmou presença ainda.</p>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="painel__rodape">
+    <p>Os convidados não enxergam nada desta página: o site só consegue
+       <em>acrescentar</em> presentes e confirmações, nunca lê-los.</p>
+    <p><a href="index.html">Voltar ao site</a></p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="js/painel.js" defer></script>
+</body>
+</html>

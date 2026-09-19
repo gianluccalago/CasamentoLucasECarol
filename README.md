@@ -9,6 +9,19 @@ aquarela, dourado dos textos e verde-folha. Tipografia **EB Garamond**
 nomes) e **Jost** (rótulos pequenos) — todas self-hosted em `assets/fonts/`.
 O monograma exibido no site é o oficial, extraído do PDF em vetor.
 
+## O que ainda falta preencher
+
+Três coisas, todas no [`config.js`](config.js) (e nenhuma exige instalar nada):
+
+| O quê | Onde | Sem isso… |
+|---|---|---|
+| **Chave PIX, titular e cidade** | `presentes.chavePix` / `titular` / `cidade` | o QR Code aponta para uma conta de exemplo |
+| **Supabase** (`url` e `anonKey`) | `supabase` — passo a passo em [SUPABASE.md](SUPABASE.md) | o presente só some para quem deu, e o painel de vocês não abre |
+| **Planilha do RSVP** (opcional) | `rsvp.googleSheetsUrl` | com o Supabase ligado, não precisa: as confirmações caem no painel |
+
+Depois de preencher a chave PIX, **façam um teste de R$ 1,00** antes de
+divulgar o site.
+
 ## Como editar o conteúdo
 
 Todo o conteúdo (textos, datas, endereço, PIX, lista de presentes e caminhos
@@ -31,13 +44,20 @@ Todas em recorte vertical 4:5, exportadas sem redução de resolução
 qualquer uma, coloque o arquivo em `assets/img/fotos/` e escreva o caminho
 no campo correspondente.
 
-As **fotos dos presentes** (`presentes.itens[].foto`) ainda usam ilustrações
-de exemplo — troque por fotos quadradas (1:1) dos itens.
-
 ### Lista de presentes: como funciona
 
-Cada item tem `valor`, `unidades` e `recebido` (quanto já entrou, em reais).
-O convidado escolhe pagar o valor cheio ou uma parte e paga por **PIX**: o
+São **92 presentes**, a lista oficial, divididos em cinco categorias —
+Cozinha, Mesa posta, Quarto e banho, Limpeza e lavanderia, e Sala,
+decoração e tecnologia. Os botões acima da lista filtram por categoria e
+mostram quantos itens ainda estão livres em cada uma.
+
+Cada item tem `nome`, `modelo` (a sugestão de marca), `valor`, `unidades` e
+`recebido` (quanto já entrou, em reais). A **foto vem sozinha** de
+`assets/img/presentes/` pelo `id` do item — `06-liquidificador` puxa
+`06-liquidificador.jpg`. Para usar outra imagem, acrescente `foto: "…"` no
+item.
+
+O convidado escolhe pagar o valor cheio ou metade e paga por **PIX**: o
 site monta na hora um QR Code com o valor já preenchido, e o dinheiro cai
 direto na conta de vocês — sem taxa e sem intermediário. Quem preferir
 dividir em vezes pode parcelar o PIX no próprio aplicativo do banco, o que
@@ -50,10 +70,10 @@ a maioria dos bancos já permite (o site menciona isso).
 **Para não darem o mesmo presente duas vezes:** depois de pagar, o convidado
 escreve o nome e clica no botão de confirmação, que mostra o valor escolhido
 (ex.: "Já fiz o PIX de R$ 120"). O item passa a aparecer como **CONQUISTADO**
-e some da lista. Contribuições parciais são somadas: quem deu metade fica
-registrado com a sua parte, o cartão mostra o progresso e outra pessoa pode
-completar depois. Itens com mais de uma unidade só bloqueiam quando o total
-for alcançado.
+e desce para o fim da lista, sem botão. Contribuições parciais são somadas:
+quem deu metade fica registrado com a sua parte, o cartão mostra o progresso
+e outra pessoa pode completar depois. Itens com mais de uma unidade só
+bloqueiam quando o total for alcançado.
 
 O site foi tipografado com corpo maior que o usual (21–22 px, rótulos a
 partir de 13 px) porque parte dos convidados é idosa.
@@ -66,22 +86,54 @@ quem clicou: quem presenteou não vê o item de novo, mas os outros sim.
 No fim da lista há um bloco **"Quero contribuir com outro valor"**, para
 quem prefere dar uma quantia à escolha sem pegar um item específico. Essa
 contribuição gera o PIX normalmente e fica registrada, mas não reserva
-nenhum presente — no painel do Supabase ela aparece em `marcacoes` sem
-presente vinculado.
+nenhum presente — aparece no painel como "Contribuição livre".
 
 Vocês também podem ajustar o campo `recebido` de qualquer item à mão, no
 `config.js` ou no painel do Supabase.
 
+### A página de acompanhamento do casal
+
+`painel.html`, no mesmo endereço do site (`https://SEU-SITE/painel.html`),
+é a página privada de vocês. Pede uma senha e mostra:
+
+- **quem presenteou o quê e quando** — nome, presente, valor e data/hora,
+  com busca;
+- **a lista inteira**, com quanto já entrou em cada item e o que falta;
+- **quem confirmou presença**, com as observações;
+- botão para **baixar planilha** (.csv) de qualquer das três.
+
+A senha não é conferida no navegador: ela vai para o banco, que só devolve
+os dados se bater. Os convidados nunca conseguem ler essas informações — o
+site só tem permissão para *acrescentar* marcações e confirmações, nunca
+para lê-las. A página não tem link nenhum no site e pede para não ser
+indexada por buscadores.
+
+Ela depende do Supabase configurado. O passo a passo, incluindo onde
+escolher a senha, está em **[SUPABASE.md](SUPABASE.md)**.
+
+### As fotos dos presentes
+
+As 92 fotos estão em `assets/img/presentes/`, todas quadradas (1:1) e
+uniformizadas a partir das imagens originais: as de fundo branco tiveram a
+sobra recortada e ganharam uma margem igual, para todos os produtos
+aparecerem no mesmo tamanho; as fotos de ambiente foram cortadas no centro.
+Saída em JPEG progressivo, até 720 px, ~39 KB por foto (3,8 MB no total),
+carregadas sob demanda conforme a rolagem.
+
 ### Confirmações de presença (RSVP)
 
-Caem numa **planilha do Google**, uma linha por convidado (data/hora, nome,
-observações). O passo a passo (~5 min) está em
-[`rsvp-apps-script.gs`](rsvp-apps-script.gs): criar a planilha, colar o
-script, implantar como App da Web e colar a URL em `rsvp.googleSheetsUrl`
+**Com o Supabase ligado** (o caminho recomendado), caem no banco e aparecem
+na aba *Presenças* do `painel.html`, com botão para baixar planilha. Não
+precisa de mais nada.
+
+**Sem o Supabase**, o site pode mandar para uma **planilha do Google**, uma
+linha por convidado (data/hora, nome, observações). O passo a passo (~5 min)
+está em [`rsvp-apps-script.gs`](rsvp-apps-script.gs): criar a planilha, colar
+o script, implantar como App da Web e colar a URL em `rsvp.googleSheetsUrl`
 no `config.js`.
 
-**Importante:** enquanto essa URL estiver vazia, o formulário apenas simula o
-envio e nada é gravado.
+**Importante:** sem nenhum dos dois configurados, o formulário apenas simula
+o envio e nada é gravado.
 
 ## O vídeo do hero
 

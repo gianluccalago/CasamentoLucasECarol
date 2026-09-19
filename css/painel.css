@@ -1,0 +1,340 @@
+/* ==========================================================================
+   PAINEL DOS NOIVOS — página privada (painel.html)
+   --------------------------------------------------------------------------
+   Reaproveita a paleta e as fontes de styles.css. Aqui não há cerimônia:
+   é uma tela de consulta, feita para ler rápido no celular.
+   ========================================================================== */
+
+.painel {
+  background: var(--paper);
+  font-size: 19px;
+}
+
+.painel__topo {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: clamp(34px, 7vw, 58px) 20px clamp(20px, 3vw, 28px);
+  text-align: center;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.painel__flor { width: 36px; height: 36px; color: var(--orange); }
+
+.painel__titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(32px, 6vw, 44px);
+  line-height: 1.1;
+}
+
+.painel__sub {
+  margin: 0;
+  font-family: var(--font-micro);
+  font-size: 14px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+
+.painel__corpo {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: clamp(28px, 5vw, 48px) clamp(16px, 4vw, 36px) 60px;
+}
+
+/* --- Entrada ------------------------------------------------------------ */
+
+.painel__entrada {
+  max-width: 480px;
+  margin-inline: auto;
+  padding: clamp(28px, 5vw, 40px);
+  background: var(--paper-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+}
+
+.painel__entrada-titulo {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.painel__entrada-nota {
+  margin: 0 0 26px;
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+.painel__entrada .botao { margin-top: 22px; }
+
+.painel__erro,
+.painel__ajuda {
+  margin: 16px 0 0;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.painel__erro { color: #8C2F17; }
+.painel__ajuda { color: var(--ink-soft); }
+
+/* --- Resumo ------------------------------------------------------------- */
+
+.resumo {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(10px, 2vw, 18px);
+}
+
+@media (min-width: 860px) { .resumo { grid-template-columns: repeat(4, 1fr); } }
+
+.resumo__bloco {
+  padding: clamp(16px, 2.6vw, 24px);
+  background: var(--paper-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  text-align: center;
+}
+
+.resumo__rotulo {
+  margin: 0;
+  font-family: var(--font-micro);
+  font-size: 12px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+
+.resumo__valor {
+  margin: 8px 0 2px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(26px, 4vw, 34px);
+  line-height: 1.1;
+  color: var(--orange-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.resumo__nota {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+/* --- Abas e ações ------------------------------------------------------- */
+
+.painel__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: clamp(28px, 4vw, 40px);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.painel__abas { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.aba {
+  padding: 11px 18px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--paper-elevated);
+  color: var(--ink);
+  font-family: var(--font-micro);
+  font-size: 15px;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.aba:hover { border-color: var(--orange); }
+
+.aba.is-ativa {
+  background: var(--leaf-deep);
+  border-color: var(--leaf-deep);
+  color: #fff;
+}
+
+.painel__acoes { display: flex; align-items: center; gap: 4px; }
+
+.botao--mini {
+  width: auto;
+  padding: 11px 20px;
+  font-size: 13px;
+  letter-spacing: .08em;
+}
+
+.painel__atualizado {
+  margin: 14px 0 0;
+  font-family: var(--font-micro);
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.painel__ferramentas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 22px 0 8px;
+}
+
+.painel__busca {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 18px;
+}
+
+.painel__filtro-situacao { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.painel__conta {
+  font-family: var(--font-micro);
+  font-size: 14px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.painel__vazio {
+  margin: 30px 0;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+/* --- Tabelas ------------------------------------------------------------ */
+
+.tabela-rolo { overflow-x: auto; }
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.tabela th {
+  text-align: left;
+  padding: 12px 14px;
+  font-family: var(--font-micro);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+  border-bottom: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+
+.tabela td {
+  padding: 14px;
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+.tabela .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabela .discreto { color: var(--ink-soft); font-size: 16px; white-space: nowrap; }
+.tabela .destaque { font-weight: 500; }
+.tabela .destaque small { display: block; font-weight: 400; font-size: 15px; color: var(--ink-soft); }
+
+.tabela tr.is-conquistado { background: color-mix(in srgb, var(--leaf) 8%, transparent); }
+
+.linha-recado td {
+  padding-top: 0;
+  border-bottom: 1px solid var(--hairline);
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--gold) 16%, transparent);
+  font-family: var(--font-micro);
+  font-size: 12px;
+  letter-spacing: .08em;
+  color: var(--gold-deep);
+  white-space: nowrap;
+}
+
+.livre-marca { font-style: italic; color: var(--ink-soft); }
+
+.selo {
+  display: inline-block;
+  padding: 5px 13px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-micro);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.selo--ok      { background: var(--leaf-deep); color: #fff; }
+.selo--parcial { background: color-mix(in srgb, var(--orange) 20%, transparent); color: var(--orange-ink); }
+.selo--livre   { background: color-mix(in srgb, var(--hairline) 55%, transparent); color: var(--ink-soft); }
+
+/* No celular cada linha vira um cartão, com o nome da coluna ao lado. */
+@media (max-width: 720px) {
+  .tabela, .tabela tbody, .tabela tr, .tabela td { display: block; width: 100%; }
+  .tabela thead { display: none; }
+
+  .tabela tr {
+    margin-bottom: 14px;
+    padding: 6px 4px;
+    background: var(--paper-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-card);
+  }
+
+  .tabela td {
+    display: flex;
+    gap: 14px;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 14px;
+    border-bottom: 0;
+    text-align: right;
+  }
+
+  .tabela td + td { border-top: 1px solid color-mix(in srgb, var(--hairline) 60%, transparent); }
+
+  .tabela td::before {
+    content: attr(data-rotulo);
+    flex: 0 0 auto;
+    font-family: var(--font-micro);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold-deep);
+    text-align: left;
+  }
+
+  .tabela .destaque small { text-align: right; }
+  .linha-recado td { text-align: left; }
+  .linha-recado td::before { content: ""; }
+}
+
+/* --- Rodapé ------------------------------------------------------------- */
+
+.painel__rodape {
+  padding: 34px 20px 54px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--hairline);
+}
+
+.painel__rodape p { margin: 0 0 8px; }
+.painel__rodape a { color: var(--orange-ink); }

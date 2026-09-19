@@ -610,10 +610,80 @@ body.travado { overflow: hidden; }
    3 · PRESENTES
    ========================================================================== */
 
+/* Explicação curta de como a lista funciona, acima dos filtros */
+.presentes__instrucao {
+  margin: 18px auto 0;
+  max-width: 62ch;
+  text-align: center;
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 1100px) { .presentes__instrucao { font-size: 20px; } }
+
+.presentes__lista { scroll-margin-top: 90px; }
+
+/* --- Filtros por categoria (são 92 presentes) --------------------------- */
+.presentes__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: clamp(34px, 5vw, 52px);
+}
+
+.filtro {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 11px 20px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--paper-elevated);
+  color: var(--ink);
+  font-family: var(--font-micro);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: .04em;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, color .2s ease;
+}
+
+.filtro:hover { border-color: var(--orange); }
+
+.filtro__conta {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.filtro.is-ativo {
+  background: var(--leaf-deep);
+  border-color: var(--leaf-deep);
+  color: #fff;
+}
+
+.filtro.is-ativo .filtro__conta { color: rgba(255, 255, 255, .82); }
+
+/* Contador acima da grade */
+.presentes__resumo {
+  margin: 20px 0 0;
+  text-align: center;
+  font-family: var(--font-micro);
+  font-size: 14px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
 .presentes__grid {
   display: grid;
   gap: clamp(20px, 3vw, 32px);
   grid-template-columns: repeat(2, 1fr);
+  margin-top: clamp(20px, 3vw, 30px);
 }
 
 @media (min-width: 780px)  { .presentes__grid { grid-template-columns: repeat(3, 1fr); } }
@@ -650,6 +720,14 @@ body.travado { overflow: hidden; }
   font-weight: 500;
   font-size: 24px;
   line-height: 1.2;
+}
+
+/* Sugestão de marca/modelo, discreta sob o nome */
+.presente__modelo {
+  margin: -2px 0 0;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--ink-soft);
 }
 
 .presente__valor {
@@ -798,9 +876,11 @@ body.travado { overflow: hidden; }
 }
 
 .modal__foto {
-  width: 118px;
-  height: 118px;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
+  background: #fff;
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
   margin-inline: auto;
 }
@@ -811,6 +891,13 @@ body.travado { overflow: hidden; }
   font-weight: 500;
   font-size: 30px;
   line-height: 1.2;
+}
+
+.modal__modelo {
+  margin: -6px 0 0;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--ink-soft);
 }
 
 .modal__valor {
