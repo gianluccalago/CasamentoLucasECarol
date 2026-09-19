@@ -175,10 +175,12 @@ const SITE = {
        - cidade: cidade da conta. Sem acentos, até 15 letras.
        ---------------------------------------------------------------- */
     chavePix: "lucassprengel@gmail.com",
-    // CONFIRMAR: tem que ser o nome do titular da conta que recebe.
-    titular: "LUCAS SPRENGEL",
-    // CONFIRMAR: a cidade cadastrada na conta que recebe.
-    cidade: "SAO JOSE DOS P",
+    /* O nome completo (Lucas Sprengel Paiva Pereira) tem 28 letras e o
+       padrão do PIX aceita 25, então vai encurtado. Os dois campos abaixo
+       são informativos: quem manda o dinheiro para a conta certa é a
+       chave acima. Trocar aqui não afeta o recebimento. */
+    titular: "LUCAS SPRENGEL PEREIRA",
+    cidade: "CURITIBA",
 
     /* ----------------------------------------------------------------
        A LISTA OFICIAL — 92 presentes em 5 categorias
