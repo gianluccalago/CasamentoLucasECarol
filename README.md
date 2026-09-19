@@ -9,18 +9,20 @@ aquarela, dourado dos textos e verde-folha. Tipografia **EB Garamond**
 nomes) e **Jost** (rótulos pequenos) — todas self-hosted em `assets/fonts/`.
 O monograma exibido no site é o oficial, extraído do PDF em vetor.
 
-## O que ainda falta preencher
+## Situação
 
-Três coisas, todas no [`config.js`](config.js) (e nenhuma exige instalar nada):
+| O quê | Situação |
+|---|---|
+| Lista oficial de 92 presentes, com fotos | pronta |
+| Banco de dados (Supabase) ligado | pronto |
+| Painel de acompanhamento do casal (`painel.html`) | pronto |
+| Chave PIX (`lucassprengel@gmail.com`) | preenchida |
+| **Nome do titular e cidade da conta** | **conferir** — `presentes.titular` e `presentes.cidade` no `config.js` |
+| **`og:image` com URL absoluta** | **depende do domínio final** — ver "Publicação" |
+| Planilha do Google para o RSVP | não é necessária: as confirmações caem no painel |
 
-| O quê | Onde | Sem isso… |
-|---|---|---|
-| **Chave PIX, titular e cidade** | `presentes.chavePix` / `titular` / `cidade` | o QR Code aponta para uma conta de exemplo |
-| **Supabase** (`url` e `anonKey`) | `supabase` — passo a passo em [SUPABASE.md](SUPABASE.md) | o presente só some para quem deu, e o painel de vocês não abre |
-| **Planilha do RSVP** (opcional) | `rsvp.googleSheetsUrl` | com o Supabase ligado, não precisa: as confirmações caem no painel |
-
-Depois de preencher a chave PIX, **façam um teste de R$ 1,00** antes de
-divulgar o site.
+Antes de mandar o link para os convidados, **façam um PIX de teste de
+R$ 1,00** pelo próprio site e confiram se o dinheiro chegou.
 
 ## Como editar o conteúdo
 

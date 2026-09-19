@@ -141,7 +141,8 @@
 .painel__abas { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .aba {
-  padding: 11px 18px;
+  /* mesma altura mínima de dedo dos filtros do site (≥ 44px) */
+  padding: 13px 18px;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-pill);
   background: var(--paper-elevated);
@@ -163,9 +164,11 @@
 
 .painel__acoes { display: flex; align-items: center; gap: 4px; }
 
+/* Botões pequenos do painel — 13px de respiro vertical para o alvo de
+   toque passar de 44px, mesmo no "Sair", que não tem borda. */
 .botao--mini {
   width: auto;
-  padding: 11px 20px;
+  padding: 13px 20px;
   font-size: 13px;
   letter-spacing: .08em;
 }

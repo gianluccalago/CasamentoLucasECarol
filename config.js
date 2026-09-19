@@ -16,16 +16,22 @@
 const SITE = {
 
   /* ------------------------------------------------------------------
-     SUPABASE (opcional) — presentes com PIX automático
+     SUPABASE — o caderninho compartilhado da lista de presentes
      ------------------------------------------------------------------
-     Preencha estes dois campos para ligar o site ao Supabase: a lista de
-     presentes passa a vir do banco e o pagamento do PIX marca o item
-     como conquistado sozinho, via Mercado Pago.
+     JÁ ESTÁ LIGADO. É ele que faz duas coisas:
+     · o presente que alguém avisou que deu some da lista para TODOS os
+       convidados, evitando presentes repetidos;
+     · o painel de vocês (painel.html) mostra quem presenteou o quê e
+       quando, e quem confirmou presença.
+
+     Não há pagamento aqui: o PIX vai direto do banco do convidado para a
+     conta de vocês. O site só anota quem avisou que presenteou.
 
      O passo a passo completo está no arquivo SUPABASE.md.
 
-     Enquanto estiverem vazios (""), o site funciona normalmente com a
-     lista de presentes escrita mais abaixo, neste mesmo arquivo.
+     Se estes dois campos ficarem vazios (""), o site volta a funcionar
+     com a lista escrita mais abaixo, neste mesmo arquivo — mas aí a
+     marcação vale só no navegador de quem clicou.
 
      A chave "anonKey" é pública por natureza e pode ficar aqui.
      NUNCA coloque aqui a chave "service_role".
@@ -168,10 +174,11 @@ const SITE = {
        - titular: nome de quem recebe. Sem acentos, até 25 letras.
        - cidade: cidade da conta. Sem acentos, até 15 letras.
        ---------------------------------------------------------------- */
-    chavePix: "chave-pix@exemplo.com",
-    titular: "MARIA CAROLINA",
+    chavePix: "lucassprengel@gmail.com",
+    // CONFIRMAR: tem que ser o nome do titular da conta que recebe.
+    titular: "LUCAS SPRENGEL",
+    // CONFIRMAR: a cidade cadastrada na conta que recebe.
     cidade: "SAO JOSE DOS P",
-    banco: "Nome do banco (edite aqui)",
 
     /* ----------------------------------------------------------------
        A LISTA OFICIAL — 92 presentes em 5 categorias

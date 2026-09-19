@@ -637,7 +637,9 @@ body.travado { overflow: hidden; }
   display: inline-flex;
   align-items: baseline;
   gap: 8px;
-  padding: 11px 20px;
+  /* 13px em cima e embaixo deixam o botão com 47px de altura: acima dos
+     44px mínimos para o dedo acertar sem esforço. */
+  padding: 13px 20px;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-pill);
   background: var(--paper-elevated);
