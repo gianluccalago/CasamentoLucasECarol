@@ -161,7 +161,7 @@ alter table public.painel_acesso enable row level security;
 revoke all on public.painel_acesso from anon, authenticated;
 
 insert into public.painel_acesso (id, senha)
-values (1, 'troque-esta-senha')      -- <<<<<< TROQUE AQUI (mínimo 8 letras)
+values (1, 'braialol')      -- <<<<<< TROQUE AQUI (mínimo 8 letras)
 on conflict (id) do nothing;
 
 -- Para mudar a senha depois:
