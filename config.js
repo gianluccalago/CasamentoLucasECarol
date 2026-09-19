@@ -31,8 +31,8 @@ const SITE = {
      NUNCA coloque aqui a chave "service_role".
      ------------------------------------------------------------------ */
   supabase: {
-    url: "",
-    anonKey: "",
+    url: "https://nifrqzfpzeeafzdsnmkk.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZnJxemZwemVlYWZ6ZHNubWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MzA4NDUsImV4cCI6MjEwNDQwNjg0NX0.eVU3SF7XdR0iHWgxYBBbK1tYzcKO0t7VpSoQL7ly-tY",
   },
 
   /* ------------------------------------------------------------------
