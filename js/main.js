@@ -156,7 +156,10 @@
       $("odia-fotos").appendChild(fig);
     });
 
-    // 3 · Presentes
+    // 3 · Dress code
+    montarDressCode();
+
+    // 4 · Presentes
     $("presentes-titulo").textContent = SITE.presentes.titulo;
     var sub = $("presentes-subtitulo");
     if (SITE.presentes.subtitulo) { sub.textContent = SITE.presentes.subtitulo; } else { sub.hidden = true; }
@@ -190,6 +193,77 @@
     $("rodape-agradecimento").textContent = SITE.rodape.agradecimento;
     $("rodape-data").textContent = SITE.evento.dataLonga;
     $("rodape-credito").textContent = SITE.rodape.credito;
+  }
+
+  /* ------------------------------------------------------------------
+     DRESS CODE: texto da Carol + inspirações, separadas em
+     "Para elas" e "Para eles"
+     ------------------------------------------------------------------ */
+  function montarDressCode() {
+    var dc = SITE.dressCode;
+    var secao = $("dress-code");
+    // Sem o bloco no config.js, a seção, o divisor e o item do menu
+    // somem juntos.
+    if (!dc) {
+      secao.hidden = true;
+      if (secao.previousElementSibling) secao.previousElementSibling.hidden = true;
+      document.querySelectorAll('a[data-secao="dress-code"]').forEach(function (a) { a.hidden = true; });
+      return;
+    }
+
+    $("dc-titulo").textContent = dc.titulo;
+    $("dc-subtitulo").textContent = dc.subtitulo || "";
+    $("dc-subtitulo").hidden = !dc.subtitulo;
+    $("dc-intro").textContent = dc.introducao || "";
+    $("dc-ideia").textContent = dc.ideia || "";
+    $("dc-ideia").hidden = !dc.ideia;
+    $("dc-inspiracoes").textContent = dc.inspiracoes || "";
+    $("dc-inspiracoes").hidden = !dc.inspiracoes;
+    $("dc-pedido-titulo").textContent = dc.pedidoTitulo || "";
+    $("dc-pedido").textContent = dc.pedido || "";
+    $("dc-pedido").parentNode.hidden = !dc.pedido;
+
+    var alvo = $("dc-grupos");
+    (dc.grupos || []).forEach(function (grupo, g) {
+      var bloco = document.createElement("article");
+      bloco.className = "traje__grupo";
+      var idTitulo = "dc-grupo-" + g;
+      bloco.setAttribute("aria-labelledby", idTitulo);
+
+      var cabeca = document.createElement("div");
+      cabeca.className = "traje__cabeca reveal";
+      var h = document.createElement("h3");
+      h.className = "traje__grupo-titulo";
+      h.id = idTitulo;
+      h.textContent = grupo.titulo;
+      var p = document.createElement("p");
+      p.className = "traje__grupo-texto";
+      p.textContent = grupo.texto;
+      cabeca.appendChild(h);
+      cabeca.appendChild(p);
+      bloco.appendChild(cabeca);
+
+      var lista = document.createElement("ul");
+      lista.className = "traje__looks";
+      lista.setAttribute("aria-label", "Inspirações — " + grupo.titulo.toLowerCase());
+      (grupo.looks || []).forEach(function (look, i) {
+        var li = document.createElement("li");
+        li.className = "traje__look reveal";
+        // Entrada em cascata, discreta.
+        li.style.transitionDelay = (i * 60) + "ms";
+        var img = document.createElement("img");
+        img.src = (grupo.pasta || "") + look.arquivo;
+        img.alt = look.alt || "";
+        img.width = 360;
+        img.height = 960;
+        img.loading = "lazy";
+        img.decoding = "async";
+        li.appendChild(img);
+        lista.appendChild(li);
+      });
+      bloco.appendChild(lista);
+      alvo.appendChild(bloco);
+    });
   }
 
   /* ------------------------------------------------------------------

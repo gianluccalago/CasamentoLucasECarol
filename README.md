@@ -122,6 +122,33 @@ aparecerem no mesmo tamanho; as fotos de ambiente foram cortadas no centro.
 Saída em JPEG progressivo, até 720 px, ~39 KB por foto (3,8 MB no total),
 carregadas sob demanda conforme a rolagem.
 
+### Dress code
+
+A seção fica entre "O grande dia" e "Presentes", com item próprio no menu.
+O texto é o da Carol, ajustado só na forma para caber no site, e vive em
+`dressCode` no `config.js`: introdução, a frase-síntese em destaque, os
+blocos **Para elas** e **Para eles**, a legenda das inspirações e o
+pedido sobre o branco, num quadro próprio no fim da seção.
+
+As 12 fotos de inspiração (6 femininas, 6 masculinas) estão em
+`assets/img/dress-code/elas/` e `assets/img/dress-code/eles/`. Foram
+recortadas look a look dos dois painéis que a Carol mandou, no formato
+3:8 (corpo inteiro, 360×960):
+
+- os três vestidos que chegavam perto de branco/off-white — um creme
+  assimétrico, um rosa-claro com renda e um cetim champanhe — ficaram
+  de fora, para as inspirações não contradizerem o pedido da noiva;
+- o texto em inglês do segundo painel ("Garden Formal Attire") não
+  aparece em nenhum recorte;
+- pedaços de outras pessoas que invadiam as bordas foram apagados, e o
+  único look feminino vindo do segundo painel ganhou o mesmo fundo bege
+  dos outros.
+
+Para trocar uma foto: coloque o arquivo novo na pasta (vertical, de
+preferência 3:8) e escreva o nome em `arquivo`, junto com uma descrição
+em `alt`. Para tirar a seção inteira, basta apagar o bloco `dressCode`:
+o item do menu some junto.
+
 ### Confirmações de presença (RSVP)
 
 **Com o Supabase ligado** (o caminho recomendado), caem no banco e aparecem

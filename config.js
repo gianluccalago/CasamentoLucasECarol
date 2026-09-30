@@ -79,6 +79,7 @@ const SITE = {
   navegacao: [
     { rotulo: "Bem-vindos",   secao: "bem-vindos" },
     { rotulo: "O grande dia", secao: "o-dia" },
+    { rotulo: "Dress code",   secao: "dress-code" },
     { rotulo: "Presentes",    secao: "presentes" },
     { rotulo: "Confirmar",    secao: "rsvp" },
   ],
@@ -140,7 +141,60 @@ const SITE = {
   },
 
   /* ------------------------------------------------------------------
-     SEÇÃO 3: PRESENTES
+     SEÇÃO 3: DRESS CODE (orientações escritas pela Carol)
+     ------------------------------------------------------------------
+     As fotos de inspiração ficam em assets/img/dress-code/elas/ e
+     assets/img/dress-code/eles/. Para trocar uma, ponha o arquivo novo
+     na pasta e escreva o nome em "arquivo". Proporção ideal: 3:8
+     (bem vertical, look de corpo inteiro), por exemplo 360 x 960.
+     O "alt" descreve a foto para quem usa leitor de tela.
+     ------------------------------------------------------------------ */
+  dressCode: {
+    titulo: "Dress code",
+    subtitulo: "esporte fino",
+    introducao: "Nosso dress code é esporte fino, pensado para unir sofisticação, conforto e liberdade para aproveitar a celebração.",
+    // Aparece em destaque, como uma citação.
+    ideia: "A ideia é simples: elegância sem rigidez, beleza sem exagero e um look que permita aproveitar cada momento da festa.",
+
+    grupos: [
+      {
+        titulo: "Para elas",
+        texto: "Vestidos midi ou longos são bem-vindos. Tecidos leves e fluidos, cores suaves ou naturais, estampas, texturas e modelagens com movimento combinam muito com a proposta.",
+        pasta: "assets/img/dress-code/elas/",
+        looks: [
+          { arquivo: "01-amarelo-de-costas.jpg", alt: "Vestido longo amarelo-manteiga, visto de costas, com faixa drapeada" },
+          { arquivo: "02-verde-plissado.jpg",    alt: "Vestido longo verde-oliva plissado, frente-única" },
+          { arquivo: "03-rosa-frente-unica.jpg", alt: "Vestido longo rosa-claro de cetim, frente-única" },
+          { arquivo: "04-azul-floral.jpg",       alt: "Vestido longo azul-claro com estampa floral, frente-única" },
+          { arquivo: "05-lima-fluido.jpg",       alt: "Vestido longo verde-lima de tecido fluido, com a saia em movimento" },
+          { arquivo: "06-rose-drapeado.jpg",     alt: "Vestido longo rosé de cetim, com decote drapeado" },
+        ],
+      },
+      {
+        titulo: "Para eles",
+        texto: "O terno completo é opcional. Também vale apostar em calça de alfaiataria com camisa ou blazer, ou em combinações mais leves. Linho e outros tecidos naturais são ótimos para a ocasião, e cores claras, terrosas, verdes, azuis e neutras estão totalmente dentro da proposta. A gravata também é opcional.",
+        pasta: "assets/img/dress-code/eles/",
+        looks: [
+          { arquivo: "01-azul-claro.jpg",       alt: "Terno azul-claro com camisa branca aberta, sem gravata" },
+          { arquivo: "02-salvia.jpg",           alt: "Terno verde-sálvia com camisa branca, sem gravata" },
+          { arquivo: "03-bege-colete.jpg",      alt: "Terno bege com colete e camisa branca" },
+          { arquivo: "04-caramelo.jpg",         alt: "Terno caramelo com camisa clara e gravata escura" },
+          { arquivo: "05-linho-claro.jpg",      alt: "Blazer de linho claro com camisa branca e calça clara" },
+          { arquivo: "06-bege-tres-pecas.jpg",  alt: "Terno bege de três peças com gravata azul-clara" },
+        ],
+      },
+    ],
+
+    // Logo abaixo das fotos.
+    inspiracoes: "As imagens acima são inspirações para ajudar vocês — não é preciso seguir os modelos à risca. Queremos que cada um se sinta bonito, confortável e representado pelo que vestir.",
+
+    // Quadro em destaque no fim da seção.
+    pedidoTitulo: "Um pedido",
+    pedido: "Para manter o destaque da noiva, pedimos apenas que evitem branco, off-white e tons muito próximos ao do vestido dela.",
+  },
+
+  /* ------------------------------------------------------------------
+     SEÇÃO 4: PRESENTES
      ------------------------------------------------------------------
      COMO FUNCIONA: o convidado escolhe um item, faz o PIX (o site monta
      o QR Code com o valor já preenchido) e avisa que o presente é dele.
@@ -375,7 +429,7 @@ const SITE = {
   },
 
   /* ------------------------------------------------------------------
-     SEÇÃO 4: CONFIRMAÇÃO DE PRESENÇA
+     SEÇÃO 5: CONFIRMAÇÃO DE PRESENÇA
      ------------------------------------------------------------------ */
   rsvp: {
     titulo: "Confirme sua presença",

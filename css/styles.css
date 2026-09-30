@@ -607,7 +607,116 @@ body.travado { overflow: hidden; }
 .odia__fotos img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ==========================================================================
-   3 · PRESENTES
+   3 · DRESS CODE
+   ========================================================================== */
+
+/* A frase-síntese da Carol, em destaque de citação */
+.traje__ideia {
+  margin: -8px auto clamp(48px, 7vw, 72px);
+  max-width: 34ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(24px, 2.8vw, 31px);
+  line-height: 1.4;
+  text-align: center;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.traje__grupos {
+  display: grid;
+  gap: clamp(56px, 8vw, 88px);
+}
+
+.traje__cabeca {
+  max-width: 62ch;
+  margin: 0 auto clamp(22px, 3vw, 32px);
+  text-align: center;
+}
+
+.traje__grupo-titulo {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(28px, 3.2vw, 36px);
+  line-height: 1.15;
+  color: var(--orange-display);
+}
+
+.traje__grupo-texto { margin: 0; color: var(--ink-soft); }
+
+/* As inspirações: 3 por linha no celular, as 6 numa linha só a partir
+   de 700px. Recortes em 3:8 — look de corpo inteiro. */
+.traje__looks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(8px, 1.4vw, 16px);
+}
+
+@media (min-width: 700px) {
+  .traje__looks { grid-template-columns: repeat(6, 1fr); }
+}
+
+.traje__look {
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--paper-elevated);
+}
+
+.traje__look img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 8;
+  object-fit: cover;
+}
+
+.traje__inspiracoes {
+  margin: clamp(40px, 6vw, 56px) auto 0;
+  max-width: 58ch;
+  font-style: italic;
+  /* itálico do Garamond é mais fino: fica no mesmo corpo do texto */
+  font-size: 21px;
+  line-height: 1.6;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+@media (min-width: 1100px) { .traje__inspiracoes { font-size: 22px; } }
+
+/* O pedido da noiva — o único quadro da seção, para não passar batido */
+.traje__pedido {
+  margin: clamp(36px, 5vw, 48px) auto 0;
+  max-width: 640px;
+  padding: clamp(24px, 4vw, 34px) clamp(22px, 4vw, 40px);
+  background: var(--paper-elevated);
+  border: 1px solid var(--hairline);
+  border-top: 3px solid var(--orange);
+  border-radius: var(--radius-card);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.traje__pedido-flor { width: 30px; height: 30px; color: var(--orange); }
+
+.traje__pedido-titulo {
+  margin: 0;
+  font-family: var(--font-micro);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+
+.traje__pedido-texto { margin: 0; }
+
+/* ==========================================================================
+   4 · PRESENTES
    ========================================================================== */
 
 /* Explicação curta de como a lista funciona, acima dos filtros */
