@@ -138,6 +138,32 @@ update public.painel_acesso set senha = 'a-nova-senha' where id = 1;
 
 ---
 
+## Se o banco pausar
+
+O plano gratuito do Supabase **pausa projetos que ficam uns dias sem
+uso**. Pausado, o endereço do banco some da internet e:
+
+- o site continua abrindo, com a lista do `config.js` — mas os presentes
+  **não somem** para os outros convidados, e o "Já fiz o PIX" dá erro;
+- o painel mostra "Não consegui alcançar o banco de dados".
+
+**Para religar:** entre em [supabase.com/dashboard](https://supabase.com/dashboard),
+abra o projeto e clique em **Restore project**. Leva alguns minutos; o
+endereço, as chaves, a senha do painel e todos os dados voltam como estavam.
+Nada no site precisa mudar.
+
+**Para não pausar de novo:** o repositório tem uma verificação automática
+(`.github/workflows/banco.yml`, aba **Actions** → *Banco do site*) que
+consulta o banco todo dia às 8h17. Isso mantém o projeto em uso. Se algo
+falhar — banco pausado, painel sumido, site desatualizado —, a execução
+fica vermelha e o GitHub manda um e-mail dizendo o que fazer.
+
+O GitHub desliga agendamentos de repositórios sem nenhum commit há 60
+dias; ele avisa por e-mail antes. Se isso acontecer, basta abrir a aba
+Actions e clicar em **Enable workflow**.
+
+---
+
 ## No dia a dia
 
 **Alguém marcou por engano:** Table Editor → `marcacoes` → apague a linha.

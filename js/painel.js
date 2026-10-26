@@ -59,6 +59,25 @@
   /* ------------------------------------------------------------------
      CONVERSA COM O BANCO
      ------------------------------------------------------------------ */
+  /* Todo erro sai daqui com um "tipo", para a tela dizer o que de fato
+     aconteceu em vez de culpar sempre a internet:
+       rede      → o pedido nem chegou ao banco (sem internet, bloqueador
+                   de anúncios, banco pausado ou fora do ar)
+       senha     → o banco recusou a senha
+       chave     → o banco recusou a chave pública do site (anonKey)
+       permissao → falta a permissão do painel no banco
+       funcao    → o painel não existe no banco
+       servidor  → o banco respondeu com erro
+       resposta  → o banco respondeu algo fora do esperado
+       tela      → os dados chegaram, mas a página falhou ao montá-los
+     "detalhe" guarda o motivo técnico, que aparece em letra pequena. */
+  function falha(tipo, detalhe) {
+    var erro = new Error(detalhe || tipo);
+    erro.tipo = tipo;
+    erro.detalhe = detalhe || "";
+    return erro;
+  }
+
   function buscarPainel(senha) {
     return fetch(SB.url + "/rest/v1/rpc/painel", {
       method: "POST",
@@ -68,20 +87,89 @@
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ p_senha: senha }),
-    }).then(function (r) {
-      return r.text().then(function (corpo) {
-        if (r.ok) return JSON.parse(corpo);
-        var erro = new Error(corpo || ("HTTP " + r.status));
-        // 403/401 e a mensagem da função significam a mesma coisa: senha errada.
-        erro.senhaErrada = r.status === 403 || r.status === 401 ||
-          corpo.indexOf("senha-incorreta") !== -1;
-        // A função ainda não existe no banco (esqueceram de rodar o SQL).
-        erro.semFuncao = r.status === 404 ||
-          corpo.indexOf("Could not find the function") !== -1 ||
-          corpo.indexOf("PGRST202") !== -1;
-        throw erro;
+    })
+      .catch(function (e) {
+        throw falha("rede", ((e && e.name) || "Erro") + ": " + ((e && e.message) || "falha de rede"));
+      })
+      .then(function (r) {
+        return r.text().then(function (corpo) {
+          var motivo = "";
+          try {
+            var j = JSON.parse(corpo);
+            motivo = [j && j.code, j && (j.message || j.msg || j.error)].filter(Boolean).join(" ");
+          } catch (e) {
+            motivo = String(corpo || "").replace(/\s+/g, " ").slice(0, 140);
+          }
+          var detalhe = "HTTP " + r.status + (motivo ? " · " + motivo : "");
+
+          if (r.ok) {
+            var dados;
+            try { dados = JSON.parse(corpo); } catch (e) { throw falha("resposta", detalhe); }
+            if (!dados || !Array.isArray(dados.presentes)) throw falha("resposta", detalhe);
+            return dados;
+          }
+          // A função responde 403 com "senha-incorreta" quando a senha não bate.
+          if (corpo.indexOf("senha-incorreta") !== -1) throw falha("senha", detalhe);
+          // 42501: o papel anônimo não pode executar a função (falta o GRANT).
+          if (corpo.indexOf("42501") !== -1) throw falha("permissao", detalhe);
+          if (r.status === 404 || corpo.indexOf("PGRST202") !== -1 ||
+              corpo.indexOf("Could not find the function") !== -1) throw falha("funcao", detalhe);
+          // 401 no Supabase = chave do site recusada (não é a senha do painel).
+          if (r.status === 401) throw falha("chave", detalhe);
+          if (r.status === 403) throw falha("senha", detalhe);
+          throw falha("servidor", detalhe);
+        });
       });
-    });
+  }
+
+  /* O que dizer para cada tipo de erro — curto, com o próximo passo. */
+  var AVISOS = {
+    senha: ["Senha incorreta. Tente de novo."],
+    rede: ["Não consegui alcançar o banco de dados.",
+           "Se o navegador tiver bloqueador de anúncios (como o Adblock), desative-o para este site ou abra o painel no Chrome. Se continuar, avise quem cuida do site: o banco pode estar pausado."],
+    chave: ["O banco recusou a chave de acesso do site.",
+            "Avise quem cuida do site: a chave pública (anonKey) do config.js precisa ser atualizada."],
+    permissao: ["O banco não deu permissão para o painel.",
+                "Avise quem cuida do site: falta rodar a parte 6 do arquivo supabase/migrations/0001_esquema.sql."],
+    funcao: ["O banco ainda não tem o painel.",
+             "Avise quem cuida do site: falta rodar a parte 6 do arquivo supabase/migrations/0001_esquema.sql."],
+    servidor: ["O banco de dados respondeu com erro.",
+               "Tente de novo em um minuto. Se continuar, avise quem cuida do site: o banco pode estar pausado."],
+    resposta: ["O banco respondeu algo inesperado.",
+               "Avise quem cuida do site e mande um print desta mensagem."],
+    tela: ["Os dados chegaram, mas a página não conseguiu montá-los.",
+           "Avise quem cuida do site e mande um print desta mensagem."],
+  };
+
+  function mostrarErro(erro) {
+    var tipo = (erro && erro.tipo) || "tela";
+    var aviso = AVISOS[tipo] || AVISOS.tela;
+    var titulo = aviso[0];
+    var dica = aviso[1] || "";
+    if (tipo === "rede" && navigator.onLine === false) {
+      titulo = "Este aparelho está sem internet agora.";
+      dica = "Conecte-se e tente de novo.";
+    }
+    var caixa = $("painel-erro");
+    caixa.textContent = "";
+    var t = document.createElement("strong");
+    t.textContent = titulo;
+    caixa.appendChild(t);
+    if (dica) {
+      var d = document.createElement("span");
+      d.className = "painel__erro-dica";
+      d.textContent = dica;
+      caixa.appendChild(d);
+    }
+    // Detalhe técnico: é o que permite descobrir a causa por um print.
+    if (tipo !== "senha") {
+      var s = document.createElement("small");
+      s.className = "painel__erro-detalhe";
+      s.textContent = "Detalhe técnico: " + tipo + " · " +
+        ((erro && (erro.detalhe || erro.message)) || "sem detalhe");
+      caixa.appendChild(s);
+    }
+    caixa.hidden = false;
   }
 
   /* ------------------------------------------------------------------
@@ -310,23 +398,26 @@
     return buscarPainel(senha)
       .then(function (resposta) {
         dados = resposta;
+        // Monta tudo ainda escondido: se algo falhar aqui, a culpa é da
+        // página, não do banco — e o erro diz isso.
+        try { desenhar(); }
+        catch (e) { throw falha("tela", ((e && e.name) || "Erro") + ": " + ((e && e.message) || "")); }
         senhaAtual = senha;
         if (lembrar) {
           try { localStorage.setItem(CHAVE_LEMBRAR, senha); } catch (e) { /* sem armazenamento */ }
         }
         $("painel-entrada").hidden = true;
         $("painel-conteudo").hidden = false;
-        desenhar();
       })
       .catch(function (erro) {
-        try { localStorage.removeItem(CHAVE_LEMBRAR); } catch (e) { /* tudo bem */ }
-        var el = $("painel-erro");
-        if (erro.senhaErrada) el.textContent = "Senha incorreta. Tente de novo.";
-        else if (erro.semFuncao) el.textContent = "O banco ainda não tem o painel. Rode o arquivo supabase/migrations/0001_esquema.sql no SQL Editor do Supabase.";
-        else el.textContent = "Não consegui falar com o banco agora. Verifique a internet e tente de novo.";
-        el.hidden = false;
+        // Só esquece a senha guardada quando ela está mesmo errada; numa
+        // queda de rede, a pessoa não precisa digitar tudo de novo.
+        if (erro && erro.tipo === "senha") {
+          try { localStorage.removeItem(CHAVE_LEMBRAR); } catch (e) { /* tudo bem */ }
+        }
+        mostrarErro(erro);
         $("painel-senha").focus();
-        $("painel-senha").select();
+        if (erro && erro.tipo === "senha") $("painel-senha").select();
       })
       .then(function () {
         botao.disabled = false;
@@ -341,7 +432,11 @@
     botao.textContent = "Atualizando…";
     buscarPainel(senhaAtual)
       .then(function (resposta) { dados = resposta; desenhar(); })
-      .catch(function () { texto($("painel-atualizado"), "Não consegui atualizar agora."); })
+      .catch(function (erro) {
+        var aviso = AVISOS[(erro && erro.tipo) || "tela"] || AVISOS.tela;
+        texto($("painel-atualizado"), "Atualização falhou — " + aviso[0].replace(/\.$/, "").toLowerCase() +
+          (erro && erro.detalhe ? " (" + erro.detalhe + ")" : ""));
+      })
       .then(function () { botao.disabled = false; botao.textContent = rotulo; });
   }
 

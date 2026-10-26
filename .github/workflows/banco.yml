@@ -49,6 +49,27 @@ jobs:
           ' >> "$GITHUB_ENV"
           echo "SITE_URL=$(grep -o 'og:url" content="[^"]*' index.html | sed 's/.*content="//; s#/$##')" >> "$GITHUB_ENV"
 
+      # Quando o Supabase pausa (ou apaga) um projeto, o endereço dele some
+      # da internet. É o primeiro sinal, e o mais fácil de reconhecer.
+      - name: 0. O endereço do banco existe na internet
+        id: dns
+        run: |
+          host=$(echo "$SB_URL" | sed 's#^https\?://##; s#/.*##')
+          procura() { dig +short @"$1" "$2" A 2>/dev/null | grep -E '^[0-9.]+$' | head -1; }
+          echo "procurando $host em servidores DNS públicos:"
+          achou=""
+          for dns in 1.1.1.1 8.8.8.8; do
+            ip=$(procura "$dns" "$host")
+            situacao=$(dig @"$dns" "$host" A 2>/dev/null | grep -o 'status: [A-Z]*' | head -1)
+            echo "  $dns → ${ip:-nenhum endereço} (${situacao:-sem status})"
+            if [ -n "$ip" ]; then achou=1; fi
+          done
+          echo "controle — supabase.co → $(procura 1.1.1.1 supabase.co || true)"
+          if [ -z "$achou" ]; then
+            echo "::error title=O banco sumiu da internet::O endereço $host não existe agora. Isso acontece quando o Supabase PAUSA o projeto por falta de uso (plano gratuito) ou quando ele é apagado. Abra supabase.com/dashboard, entre no projeto e clique em 'Restore project'."
+            exit 1
+          fi
+
       - name: 1. A lista de presentes responde (e mantém o banco acordado)
         run: |
           codigo=$(curl -sS -o resposta.txt -w '%{http_code}' --max-time 40 \
@@ -63,7 +84,7 @@ jobs:
           echo "presentes ativos no banco: $(node -e 'console.log(JSON.parse(require("fs").readFileSync("resposta.txt","utf8")).length)')"
 
       - name: 2. O painel dos noivos existe e recusa senha errada
-        if: always()
+        if: always() && steps.dns.outcome == 'success'
         run: |
           codigo=$(curl -sS -o resposta.txt -w '%{http_code}' --max-time 40 -X POST \
             "$SB_URL/rest/v1/rpc/painel" \
@@ -78,7 +99,7 @@ jobs:
           fi
 
       - name: 3. O navegador pode chamar o banco a partir do site (CORS)
-        if: always()
+        if: always() && steps.dns.outcome == 'success'
         run: |
           codigo=$(curl -sS -o /dev/null -D cabecalhos.txt -w '%{http_code}' --max-time 40 -X OPTIONS \
             "$SB_URL/rest/v1/rpc/painel" \

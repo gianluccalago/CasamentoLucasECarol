@@ -78,7 +78,20 @@
   line-height: 1.5;
 }
 
-.painel__erro { color: #8C2F17; }
+.painel__erro { color: #8C2F17; display: grid; gap: 6px; }
+.painel__erro strong { font-weight: 600; }
+.painel__erro-dica { color: var(--ink); }
+
+/* O motivo técnico: pequeno, mas legível num print */
+.painel__erro-detalhe {
+  margin-top: 4px;
+  font-family: var(--font-micro);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: .02em;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
 .painel__ajuda { color: var(--ink-soft); }
 
 /* --- Resumo ------------------------------------------------------------- */
