@@ -1,0 +1,118 @@
+# ==========================================================================
+# BANCO DO SITE — verificação diária do Supabase
+# ==========================================================================
+# Para que serve:
+#
+# 1. MANTER O BANCO ACORDADO. O plano gratuito do Supabase pausa o projeto
+#    depois de uns dias sem uso. Pausado, o site continua abrindo, mas os
+#    presentes param de sumir da lista para os outros convidados e o painel
+#    dos noivos não entra. Uma consulta por dia evita a pausa.
+#
+# 2. AVISAR QUANDO ALGO QUEBRA. Se qualquer verificação falhar, a execução
+#    fica vermelha e o GitHub manda um e-mail para o dono do repositório.
+#    O passo que falhou diz o que fazer.
+#
+# Não usa nenhuma senha de verdade: só a chave pública (anon) que já está
+# no config.js, e uma senha de painel propositalmente errada.
+#
+# Para rodar na hora: aba "Actions" do repositório → "Banco do site" →
+# "Run workflow".
+# ==========================================================================
+
+name: Banco do site
+
+on:
+  schedule:
+    - cron: "17 11 * * *"        # todo dia, 8h17 em Brasília
+  workflow_dispatch:             # botão "Run workflow"
+
+permissions:
+  contents: read
+  actions: write                 # só para o último passo
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lê o endereço do banco e a chave pública do config.js
+        run: |
+          node -e '
+            global.window = {};
+            require("./config.js");
+            const s = window.SITE.supabase;
+            if (!s || !s.url || !s.anonKey) { console.error("supabase vazio no config.js"); process.exit(1); }
+            console.log("SB_URL=" + s.url.replace(/\/+$/, ""));
+            console.log("SB_KEY=" + s.anonKey);
+          ' >> "$GITHUB_ENV"
+          echo "SITE_URL=$(grep -o 'og:url" content="[^"]*' index.html | sed 's/.*content="//; s#/$##')" >> "$GITHUB_ENV"
+
+      - name: 1. A lista de presentes responde (e mantém o banco acordado)
+        run: |
+          codigo=$(curl -sS -o resposta.txt -w '%{http_code}' --max-time 40 \
+            "$SB_URL/rest/v1/presentes?select=id&ativo=eq.true" \
+            -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY") || codigo=000
+          echo "HTTP $codigo"
+          echo "resposta: $(head -c 300 resposta.txt 2>/dev/null)"
+          if [ "$codigo" != "200" ]; then
+            echo "::error title=Banco fora do ar (HTTP $codigo)::Abra supabase.com/dashboard, entre no projeto e, se aparecer 'Project paused', clique em 'Restore project'. Se for 401, a chave anon do config.js foi trocada ou desativada."
+            exit 1
+          fi
+          echo "presentes ativos no banco: $(node -e 'console.log(JSON.parse(require("fs").readFileSync("resposta.txt","utf8")).length)')"
+
+      - name: 2. O painel dos noivos existe e recusa senha errada
+        if: always()
+        run: |
+          codigo=$(curl -sS -o resposta.txt -w '%{http_code}' --max-time 40 -X POST \
+            "$SB_URL/rest/v1/rpc/painel" \
+            -H "apikey: $SB_KEY" -H "Authorization: Bearer $SB_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"p_senha":"verificacao-automatica-senha-errada"}') || codigo=000
+          echo "HTTP $codigo"
+          echo "resposta: $(head -c 300 resposta.txt 2>/dev/null)"
+          if ! grep -q "senha-incorreta" resposta.txt 2>/dev/null; then
+            echo "::error title=Painel com problema (HTTP $codigo)::Esperava a recusa 'senha-incorreta'. Se for 404, rode de novo a parte 6 do supabase/migrations/0001_esquema.sql no SQL Editor."
+            exit 1
+          fi
+
+      - name: 3. O navegador pode chamar o banco a partir do site (CORS)
+        if: always()
+        run: |
+          codigo=$(curl -sS -o /dev/null -D cabecalhos.txt -w '%{http_code}' --max-time 40 -X OPTIONS \
+            "$SB_URL/rest/v1/rpc/painel" \
+            -H "Origin: $SITE_URL" \
+            -H "Access-Control-Request-Method: POST" \
+            -H "Access-Control-Request-Headers: apikey,authorization,content-type") || codigo=000
+          echo "HTTP $codigo (origem: $SITE_URL)"
+          grep -i '^access-control-allow' cabecalhos.txt || true
+          if ! grep -qi '^access-control-allow-origin' cabecalhos.txt; then
+            echo "::error title=CORS::O banco não autorizou chamadas vindas de $SITE_URL."
+            exit 1
+          fi
+
+      - name: 4. O site publicado aponta para este mesmo banco
+        if: always()
+        run: |
+          for arquivo in index.html painel.html config.js js/painel.js; do
+            codigo=$(curl -sS -o "pub_$(basename $arquivo)" -w '%{http_code}' --max-time 40 "$SITE_URL/$arquivo") || codigo=000
+            echo "$SITE_URL/$arquivo → HTTP $codigo"
+            [ "$codigo" = "200" ] || { echo "::error title=Site::$arquivo não abriu (HTTP $codigo)."; exit 1; }
+          done
+          if ! grep -q "$SB_URL" pub_config.js; then
+            echo "::error title=Site desatualizado::O config.js publicado não aponta para $SB_URL. Confira o último deploy no Render."
+            exit 1
+          fi
+          echo "config.js publicado aponta para o banco certo."
+
+      # O GitHub desliga agendamentos de repositórios sem commits há 60 dias.
+      # Reativar o próprio workflow pela API costuma zerar essa contagem;
+      # se não der, o GitHub avisa por e-mail antes e basta reativar com um
+      # clique na aba Actions. Este passo nunca reprova a verificação.
+      - name: Mantém o agendamento ligado
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/banco.yml/enable" && echo "agendamento confirmado"
